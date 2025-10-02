@@ -4,9 +4,9 @@
 
 ## 教材の内容物一覧
 
-Webページ形式のドキュメントは[こちら](./docs/_site/index.html)から閲覧できる。
+Webページ形式のドキュメントは[こちら](https://shima-nct.github.io/Computer_Networking_Lab/)から閲覧できる。
 
-PDF形式のドキュメントは[こちら](./docs/_site/index.pdf)からダウンロードできる。
+PDF形式のドキュメントは[こちら](./docs/index.pdf)からダウンロードできる。
 
 [docs](./docs)、[images](./images)ディレクトリには、以下の資料が含まれている。
 
