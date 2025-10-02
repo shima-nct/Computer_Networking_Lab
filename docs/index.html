@@ -6,7 +6,6 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="author" content="嶋直樹">
 <meta name="dcterms.date" content="2025-10-02">
 
 <title>3B情2 ネットワーク構築</title>
@@ -71,102 +70,49 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="index_files/libs/quarto-html/quarto-syntax-highlighting-7b89279ff1a6dce999919e0e67d4d9ec.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="index_files/libs/bootstrap/bootstrap.min.js"></script>
 <link href="index_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="index_files/libs/bootstrap/bootstrap-9e1a330ec442a69fd7f4c07a185c68cb.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
-</head><body class="quarto-light">\usepackage{xeCJK}
-\xeCJKsetup{CJKecglue = {}} % 和文と英数の自動スペースを抑止（表題の誤空白対策）
-\usepackage{titling}
-\date{}
-\predate{}\postdate{} 
-% 右上に Ver./日付（タイトル直前に挿入）
-\pretitle{%
-    \begin{flushright}
-      Ver.\ v0.1.0 \ / \ October 2, 2025
-    \end{flushright}
-    \begin{center}\LARGE\bfseries
-  }
-\posttitle{\par\end{center}\vspace{1em}}
-% 著者は右寄せ
-\preauthor{\begin{flushright}}
-\postauthor{\end{flushright}\vspace{2em}}
-
-\usepackage{titlesec}
-\titlespacing*{\section}{0pt}{1.5ex plus 1ex minus .2ex}{0.8ex plus .2ex}
-\usepackage{fontspec}
-
-\usepackage{xeCJK}
-\newcommand{\setfontifexists}[2]{\IfFontExistsTF{#1}{#2}{}}
-\setfontifexists{TeX Gyre Termes}{\setmainfont{TeX Gyre Termes}}
-\setfontifexists{Noto Serif}{\setmainfont{Noto Serif}}
-\setfontifexists{TeX Gyre Heros}{\setsansfont{TeX Gyre Heros}}
-\setfontifexists{Noto Sans}{\setsansfont{Noto Sans}}
-\setfontifexists{TeX Gyre Cursor}{\setmonofont{TeX Gyre Cursor}}
-\setfontifexists{Noto Sans Mono}{\setmonofont{Noto Sans Mono}}
-\setfontifexists{Yu Mincho}{\setCJKmainfont{Yu Mincho}}
-\setfontifexists{MS Mincho}{\setCJKmainfont{MS Mincho}}
-\setfontifexists{Noto Serif CJK JP}{\setCJKmainfont{Noto Serif CJK JP}}
-\setfontifexists{Yu Gothic UI}{\setCJKsansfont{Yu Gothic UI}}
-\setfontifexists{Yu Gothic}{\setCJKsansfont{Yu Gothic}}
-\setfontifexists{MS Gothic}{\setCJKsansfont{MS Gothic}}
-\setfontifexists{Noto Sans CJK JP}{\setCJKsansfont{Noto Sans CJK JP}}
-\setfontifexists{Yu Gothic UI}{\setCJKmonofont{Yu Gothic UI}}
-\setfontifexists{Yu Gothic}{\setCJKmonofont{Yu Gothic}}
-\setfontifexists{MS Gothic}{\setCJKmonofont{MS Gothic}}
-\setfontifexists{Noto Sans Mono CJK JP}{\setCJKmonofont{Noto Sans Mono CJK JP}}
+<link href="index_files/libs/bootstrap/bootstrap-6b644e33ed36ddf8b552b26d431ef1a9.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 
 
 <link rel="stylesheet" href="styles.css">
+</head>
 
-
-
+<body class="quarto-light">
 
 <div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
 <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
 <div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="index.pdf"><i class="bi bi-file-pdf"></i>PDF</a></li></ul></div></div>
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default">
-<div class="quarto-title">
-<h1 class="title">3B情2 ネットワーク構築</h1>
-</div>
+<header id="title-block-header">
+<h1 class="title display-7">3B情2 ネットワーク構築</h1>
 
-
-
-<div class="quarto-title-meta">
-
-    <div>
-    <div class="quarto-title-meta-heading">Author</div>
-    <div class="quarto-title-meta-contents">
-             <p>嶋直樹 </p>
-          </div>
-  </div>
-    
-    <div>
-    <div class="quarto-title-meta-heading">Published</div>
-    <div class="quarto-title-meta-contents">
-      <p class="date">October 2, 2025</p>
-    </div>
-  </div>
-  
-    
-  </div>
-  
-
-
+<p class="date">2025-10-02</p>
 </header>
 
 
+<div data-when-format="html">
+<div class="lab-meta-rt">
+v0.1.1 / 2025-10-02
+</div>
+<h1 class="lab-title">
+<p>3B情2 ネットワーク構築</p>
+</h1>
+<div class="lab-author">
+<p>嶋&nbsp;直樹</p>
+</div>
+</div>
 <section id="実験概要" class="level1">
 <h1>実験概要</h1>
 <section id="実験の全体目標" class="level2">
 <h2 class="anchored" data-anchor-id="実験の全体目標">1. 実験の全体目標</h2>
-<p>学生は2回の実験（各180分）を通して、多層的な内部ネットワークの構築、静的ルーティング、DNSによる名前解決、そしてNAPTによるインターネット接続までを実践的に体験し、その仕組みを深く理解することを目標とする。</p>
+<p>学生は3回の実験（各180分）を通して、多層的な内部ネットワークの構築、静的ルーティング、DNSによる名前解決、そしてNAPTによるインターネット接続までを実践的に体験し、その仕組みを深く理解することを目標とする。</p>
 </section>
 <section id="ネットワーク構成" class="level2">
 <h2 class="anchored" data-anchor-id="ネットワーク構成">2. ネットワーク構成</h2>
-<p>実験で構築するネットワークの全体像は以下の通りである。</p>
+<p>実験で構築するネットワークの全体像は以下のFigure.1に示す通りである。</p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><img src="../images/new_network_diagram.png" class="img-fluid figure-img" style="width:40.0%"></p>
+<p><img src="./images/new_network_diagram.png" class="img-fluid figure-img" style="width:40.0%"></p>
 <figcaption>ネットワーク構成図</figcaption>
 </figure>
 </div>
@@ -415,13 +361,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="ネットワーク構成とipアドレッシング" class="level3">
 <h3 class="anchored" data-anchor-id="ネットワーク構成とipアドレッシング">2.2. ネットワーク構成とIPアドレッシング</h3>
-<p>今回は、以下の図に示すネットワークを構築する。IPアドレスの設定ミスは通信失敗の主な原因となるため、各機器の役割とアドレスを常に確認すること。</p>
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><img src="../images/new_network_diagram.png" class="img-fluid figure-img" style="width:40.0%"></p>
-<figcaption>ネットワーク構成図</figcaption>
-</figure>
-</div>
+<p>今回は、以下のFigure.1に示すネットワークを構築する。IPアドレスの設定ミスは通信失敗の主な原因となるため、各機器の役割とアドレスを常に確認すること。</p>
 <p><strong>IPアドレス設定表</strong></p>
 <table class="caption-top table">
 <thead>

@@ -1,0 +1,23 @@
+/* 右上 Ver./日付 */
+.lab-meta-rt {
+  text-align: right;
+  font-size: 0.95rem;
+  margin-top: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+/* タイトル中央 */
+.lab-title {
+  text-align: center;
+  margin-top: 0.2rem;
+  margin-bottom: 0.8rem;
+}
+
+/* 著者右寄せ */
+.lab-author {
+  text-align: right;
+  margin-bottom: 1.2rem;
+}
+
+/* 念のため、既定のタイトルメタが出ても非表示に */
+.quarto-title, .quarto-title-meta { display: none; }

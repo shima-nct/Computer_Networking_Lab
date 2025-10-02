@@ -1,25 +1,22 @@
-/* タイトルを中央揃え */
-.quarto-title-block .title {
-    text-align: center;
-  }
-  
-  /* 筆者名（タイトル直下）を右揃え */
-  .quarto-title-block .quarto-title-authors {
-    text-align: right;
-  }
-  
-  /* 既定のタイトルブロック内「日付」は非表示（重複防止） */
-  .quarto-title-block .quarto-title-meta .date {
-    display: none;
-  }
-  
-  /* ページ最上部に置くビルド情報（右揃え） */
-  .lab-meta {
-    text-align: right;
-    margin-top: 0.5rem;
-    margin-bottom: 1.25rem;
-    font-size: 0.95rem;
-    line-height: 1.4;
-    opacity: 0.9;
-  }
-  
+.lab-meta-rt {
+  text-align: right;
+  font-size: .95rem;
+  margin:.5rem 0 1rem;
+}
+.lab-title {
+  text-align: center;
+  font-size: 1.6rem;
+  margin:.2rem 0 .8rem;
+}
+.lab-author {
+  text-align: right;
+  margin-bottom: 1.2rem;
+}
+
+/* 念のため、既定のタイトルメタが出ても非表示に */
+.quarto-title, .quarto-title-meta { display: none; }
+/* 既定のタイトルブロック全体を非表示（AUTHOR/PUBLISHED 含む） */
+#title-block-header { display: none; }
+
+/* サイドの Other Formats（PDFリンク等）も不要なら */
+.quarto-alternate-formats { display: none; }

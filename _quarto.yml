@@ -1,0 +1,74 @@
+project:
+  type: default
+  output-dir: docs
+
+# ここに共通メタを置く（index.qmd から {{< meta ... >}} で参照可）
+metadata:
+  title: "3B情2 ネットワーク構築"
+  author_pdf: "嶋\\enspace  直樹"
+  author_html: "嶋&nbsp;直樹"
+  date: today
+  version: "v0.1.1"
+
+format:
+  html:
+    theme: cosmo
+    css: styles.css
+    title-block-style: none
+
+  pdf:
+    pdf-engine: xelatex
+    documentclass: article
+    number-sections: false
+    papersize: a4                       # ← paper ではなく papersize
+    fontsize: 10pt
+    geometry: "top=20mm, bottom=20mm, left=20mm, right=20mm"
+    toc: false
+
+    # （フォントや header-includes は pdf の並列に置いてもOK。pdf配下でも可）
+    mainfont: "TeX Gyre Termes"
+    sansfont: "TeX Gyre Heros"
+    monofont: "TeX Gyre Cursor"
+
+    header-includes:
+      - |
+        \usepackage{xeCJK}
+        \xeCJKsetup{CJKecglue = {}} % 和文と英数の自動スペースを抑止（表題の誤空白対策）
+        \usepackage{titling}
+        \date{}
+        \predate{}\postdate{} 
+        % 右上に Ver./日付（タイトル直前に挿入）
+        \pretitle{%
+            \begin{flushright}
+              {{< meta version >}} \ / \ {{< meta date >}}
+            \end{flushright}
+            \begin{center}\LARGE\bfseries
+          }
+        \posttitle{\par\end{center}\vspace{1em}}
+        % 著者は右寄せ
+        \preauthor{\begin{flushright}}
+        \postauthor{\end{flushright}\vspace{2em}}
+
+        \usepackage{titlesec}
+        \titlespacing*{\section}{0pt}{1.5ex plus 1ex minus .2ex}{0.8ex plus .2ex}
+        \usepackage{fontspec}
+
+        \usepackage{xeCJK}
+        \newcommand{\setfontifexists}[2]{\IfFontExistsTF{#1}{#2}{}}
+        \setfontifexists{TeX Gyre Termes}{\setmainfont{TeX Gyre Termes}}
+        \setfontifexists{Noto Serif}{\setmainfont{Noto Serif}}
+        \setfontifexists{TeX Gyre Heros}{\setsansfont{TeX Gyre Heros}}
+        \setfontifexists{Noto Sans}{\setsansfont{Noto Sans}}
+        \setfontifexists{TeX Gyre Cursor}{\setmonofont{TeX Gyre Cursor}}
+        \setfontifexists{Noto Sans Mono}{\setmonofont{Noto Sans Mono}}
+        \setfontifexists{Yu Mincho}{\setCJKmainfont{Yu Mincho}}
+        \setfontifexists{MS Mincho}{\setCJKmainfont{MS Mincho}}
+        \setfontifexists{Noto Serif CJK JP}{\setCJKmainfont{Noto Serif CJK JP}}
+        \setfontifexists{Yu Gothic UI}{\setCJKsansfont{Yu Gothic UI}}
+        \setfontifexists{Yu Gothic}{\setCJKsansfont{Yu Gothic}}
+        \setfontifexists{MS Gothic}{\setCJKsansfont{MS Gothic}}
+        \setfontifexists{Noto Sans CJK JP}{\setCJKsansfont{Noto Sans CJK JP}}
+        \setfontifexists{Yu Gothic UI}{\setCJKmonofont{Yu Gothic UI}}
+        \setfontifexists{Yu Gothic}{\setCJKmonofont{Yu Gothic}}
+        \setfontifexists{MS Gothic}{\setCJKmonofont{MS Gothic}}
+        \setfontifexists{Noto Sans Mono CJK JP}{\setCJKmonofont{Noto Sans Mono CJK JP}}

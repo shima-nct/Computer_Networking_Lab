@@ -1,0 +1,12 @@
+::: {when-format="html"}
+<div class="lab-meta-rt">{{< meta version >}} / {{< meta date >}}</div>
+<h1 class="lab-title">{{< meta title >}}</h1>
+<div class="lab-author">{{< meta author_html >}}</div>
+:::
+
+
+{{< include chapters/experiment_design.qmd >}}
+{{< include chapters/experiment_manual_1.qmd >}}
+{{< include chapters/experiment_manual_2.qmd >}}
+{{< include chapters/report_assignment.qmd >}}
+{{< include chapters/linux_command_cheatsheet.qmd >}}
