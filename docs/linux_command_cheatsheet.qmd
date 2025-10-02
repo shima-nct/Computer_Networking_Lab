@@ -1,0 +1,147 @@
+# 補助資料1：Linuxネットワークコマンド チートシート
+
+この資料は、実験で使用する主要なLinuxネットワークコマンドの基本的な使い方をまとめたものである。より複雑なネットワークに対応するため、`iptables` や `bind9` 関連のコマンドを追加している。
+
+## 1. `ip` コマンド (基本)
+
+ネットワークインターフェースやルーティングテーブルを管理する基本コマンドである。
+
+*   **インターフェースとIPアドレスの表示**
+    ```bash
+    ip address show
+    # 短縮形: ip a
+    ```
+
+*   **IPアドレスの追加** (例: `192.168.1.10/24` を `eth0` に)
+    ```bash
+    sudo ip addr add 192.168.1.10/24 dev eth0
+    ```
+
+*   **ルーティングテーブルの表示**
+    ```bash
+    ip route show
+    # 短縮形: ip r
+    ```
+
+*   **デフォルトゲートウェイの追加** (例: `192.168.1.1`)
+    ```bash
+    sudo ip route add default via 192.168.1.1
+    ```
+
+*   **静的ルートの追加** (例: `192.168.1.0/24` へのパケットを `192.168.0.11` へ転送)
+    ```bash
+    sudo ip route add 192.168.1.0/24 via 192.168.0.11
+    ```
+
+## 2. `ping` & `traceroute` (疎通確認)
+
+*   **指定ホストとの疎通確認**
+    ```bash
+    ping 192.168.1.10
+    ```
+
+*   **指定ホストまでの経路追跡**
+    ```bash
+    traceroute 192.168.1.10
+    ```
+
+## 3. `iptables` (ファイアウォール & NAPT)
+
+Linuxカーネルのパケットフィルタリング機能（Netfilter）を操作するコマンドであり、NAPTの設定に用いる。
+
+*   **現在のNATテーブルのルールを表示**
+    ```bash
+    sudo iptables -t nat -L -v
+    ```
+
+*   **NAPT（IPマスカレード）ルールの追加**
+    (WAN側インターフェースが `eth0` の場合、`eth0` から出ていくパケットの送信元を `eth0` のIPアドレスに書き換える)
+    ```bash
+    sudo iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
+    ```
+
+*   **NATテーブルのルールをすべて削除**
+    ```bash
+    sudo iptables -t nat -F
+    ```
+
+## 4. `conntrack` (コネクショントラッキング)
+
+NAPTによって変換されている通信セッションの状態を確認できる。
+
+*   **`conntrack` ツールのインストール**
+    ```bash
+    sudo apt update
+    sudo apt install conntrack
+    ```
+
+*   **現在のコネクショントラックテーブルを表示**
+    ```bash
+    sudo conntrack -L
+    ```
+
+*   **特定の送信元IPアドレスでフィルタリング** (例: ClientA `192.168.1.10`)
+    ```bash
+    sudo conntrack -L -s 192.168.1.10
+    ```
+
+## 5. BIND9 (DNSサーバー)
+
+DNSサーバー `BIND9` の管理用コマンドをまとめる。
+
+*   **BIND9のインストール**
+    ```bash
+    sudo apt update
+    sudo apt install bind9
+    ```
+
+*   **設定ファイルの構文チェック**
+    ```bash
+    sudo named-checkconf
+    ```
+
+*   **ゾーンファイルの構文チェック** (例: `corp.local` ゾーン)
+    ```bash
+    sudo named-checkzone corp.local /etc/bind/db.corp.local
+    ```
+
+*   **BIND9サービスの再起動**
+    ```bash
+    sudo systemctl restart bind9
+    ```
+
+*   **BIND9サービスのステータス確認**
+    ```bash
+    sudo systemctl status bind9
+    ```
+
+## 6. `nslookup` & `dig` (DNSクライアント)
+
+DNSサーバーに問い合わせて名前解決を行うコマンドである。
+
+*   **`nslookup` でドメイン名を問い合わせる**
+    ```bash
+    nslookup intweb.corp.local
+    ```
+
+*   **`dig` で詳細な情報を問い合わせる**
+    ```bash
+    dig www.example.com
+    ```
+
+## 7. その他
+
+*   **IPフォワーディングの有効化** (ルーター機能の有効化)
+    ```bash
+    sudo sysctl -w net.ipv4.ip_forward=1
+    ```
+
+*   **DNSサーバー設定ファイルの確認・編集**
+    (クライアントPCが参照するDNSサーバーのアドレスを管理する)
+    ```bash
+    # 確認
+    cat /etc/resolv.conf
+
+    # 編集 (例: 192.168.0.53 を指定)
+    echo "nameserver 192.168.0.53" | sudo tee /etc/resolv.conf
+    ```

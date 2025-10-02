@@ -1,0 +1,219 @@
+# 実験手順書：第1回 内部ネットワークの構築と静的ルーティング
+
+## 1. 実験の目的
+
+この実験では、複数のルーターとサーバーを含む実践的な多層ネットワークをゼロから構築する。静的ルーティングを設定し、異なるネットワークセグメント間の通信を確立するとともに、内部DNSサーバーによる名前解決の仕組みを学ぶ。今回の目標は以下の通りである。
+
+*   複数のネットワークセグメントにまたがるIPアドレッシングを計画し、設定できる。
+*   Linux PCをルーターとして機能させ、IPフォワーディングと静的ルートを設定できる。
+*   `ping` および `traceroute` を用いて、複雑なネットワークにおける通信経路を特定し、問題を診断できる。
+*   DNSサーバーを構築し、内部ドメインの名前解決を実現できる。
+
+## 2. 実験環境
+
+### 2.1. 必要な機材
+
+*   UbuntuがインストールされたPC: 6台 (GW, R1, R2, IntDNS, IntWeb, ClientA)
+    *   *注: ClientB役のPCも必要であるが、1台のPCで役割を交代しながら実験することも可能である。GW, R1, R2役のPCはNICが2枚必要である。*
+*   スイッチングハブ: 3台
+*   LANケーブル: 適量
+
+### 2.2. ネットワーク構成とIPアドレッシング
+
+今回は、以下の図に示すネットワークを構築する。IPアドレスの設定ミスは通信失敗の主な原因となるため、各機器の役割とアドレスを常に確認すること。
+
+![ネットワーク構成図](../images/new_network_diagram.png){ width=40% }
+
+**IPアドレス設定表**
+
+| 機器名 | 役割 | インターフェース | IPアドレス/マスク | ゲートウェイ |
+| :--- | :--- | :--- | :--- | :--- |
+| GW | ゲートウェイ | LAN (eth1) | `192.168.0.1/24` | - |
+| IntDNS | 内部DNS | eth0 | `192.168.0.53/24` | `192.168.0.1` |
+| IntWeb | 内部Web | eth0 | `192.168.0.80/24` | `192.168.0.1` |
+| R1 | ルーター1 | WAN (eth0) | `192.168.0.11/24` | `192.168.0.1` |
+| | | LAN (eth1) | `192.168.1.1/24` | - |
+| R2 | ルーター2 | WAN (eth0) | `192.168.0.12/24` | `192.168.0.1` |
+| | | LAN (eth1) | `192.168.2.1/24` | - |
+| ClientA | クライアントA | eth0 | `192.168.1.10/24` | `192.168.1.1` |
+| ClientB | クライアントB | eth0 | `192.168.2.10/24` | `192.168.2.1` |
+
+## 3. 実験手順
+
+### ステップ1：物理接続とIPアドレス設定
+
+構成図に従って各機器をLANケーブルで接続した後、すべてのPCに上記の表通りIPアドレスを設定する。ここではインターフェース名を `eth0`, `eth1` としているが、`ip a` で確認した実際の名前に置き換えること。
+
+**1. ルーター/ゲートウェイ (GW, R1, R2)**
+
+```bash
+# GWでの設定例
+sudo ip addr add 192.168.0.1/24 dev eth1
+sudo sysctl -w net.ipv4.ip_forward=1
+
+# R1での設定例
+sudo ip addr add 192.168.0.11/24 dev eth0
+sudo ip addr add 192.168.1.1/24 dev eth1
+sudo sysctl -w net.ipv4.ip_forward=1
+
+# R2での設定例
+sudo ip addr add 192.168.0.12/24 dev eth0
+sudo ip addr add 192.168.2.1/24 dev eth1
+sudo sysctl -w net.ipv4.ip_forward=1
+```
+
+**2. サーバー (IntDNS, IntWeb)**
+
+```bash
+# IntDNSでの設定例
+sudo ip addr add 192.168.0.53/24 dev eth0
+```
+
+**3. クライアント (ClientA, ClientB)**
+
+```bash
+# ClientAでの設定例
+sudo ip addr add 192.168.1.10/24 dev eth0
+```
+
+### ステップ2：静的ルーティング設定
+
+各機器が「自分宛てでないパケットをどこへ送るべきか」を把握するために、ルーティング情報を設定する。
+
+**1. クライアントとサーバーのデフォルトゲートウェイ設定**
+
+各機器は、自分の所属するLANの出口となるルーターのIPアドレスをデフォルトゲートウェイとして設定する。
+
+```bash
+# ClientAでの設定例
+sudo ip route add default via 192.168.1.1
+
+# ClientBでの設定例
+sudo ip route add default via 192.168.2.1
+
+# IntDNS, IntWebでの設定例
+sudo ip route add default via 192.168.0.1
+```
+
+**2. ルーターのルーティング設定**
+
+ルーターは、より複雑な経路情報を持つ。
+
+```bash
+# R1, R2のデフォルトゲートウェイ設定
+# R1, R2ともに、未知の宛先はすべてGW(192.168.0.1)に送る
+sudo ip route add default via 192.168.0.1
+
+# GWの静的ルート設定
+# GWは、192.168.1.0/24宛のパケットはR1(192.168.0.11)へ、
+# 192.168.2.0/24宛はR2(192.168.0.12)へ送るように設定する
+sudo ip route add 192.168.1.0/24 via 192.168.0.11
+sudo ip route add 192.168.2.0/24 via 192.168.0.12
+```
+
+### ステップ3：内部ネットワーク全体の疎通確認
+
+`ping` と `traceroute` を使い、設定が正しいか確認する。
+
+1.  **ClientAから様々な宛先へ `traceroute` を実行せよ。**
+
+    ```bash
+    # ClientAから同じセグメントのルーター(R1)へ
+    traceroute 192.168.1.1
+
+    # ClientAからGWへ
+    traceroute 192.168.0.1
+    # 経由地にR1(192.168.1.1)が表示されるはず
+
+    # ClientAから内部Webサーバーへ
+    traceroute 192.168.0.80
+    # 経由地にR1(192.168.1.1)とGW(192.168.0.1)が表示されるはず
+
+    # ClientAからClientBへ ★最重要
+    traceroute 192.168.2.10
+    # 経由地にR1→GW→R2が表示されることを確認
+    ```
+
+2.  **`ping` で通信できることを確認する。** 上記 `traceroute` で確認したすべての宛先に `ping` が通るはずである。もし失敗する場合、`traceroute` の結果を手掛かりに、どの区間で問題が起きているか（IPアドレス設定ミス、ルート設定漏れなど）を切り分けること。
+
+### ステップ4：内部DNSサーバーの構築
+
+IPアドレスではなく、分かりやすい名前でサーバーにアクセスできるようにする。
+
+1.  **IntDNSサーバーにBIND9をインストールする。**
+    ```bash
+    # IntDNSで実行
+    sudo apt update
+    sudo apt install bind9
+    ```
+
+2.  **ゾーンファイルの設定を行う。**
+    `corp.local` という内部ドメインを管理する設定を追加する。
+
+    ```bash
+    # /etc/bind/named.conf.local に以下を追記
+    sudo nano /etc/bind/named.conf.local
+    ```
+    ```text
+    zone "corp.local" {
+        type master;
+        file "/etc/bind/db.corp.local";
+    };
+    ```
+
+3.  **ゾーンファイルを作成する。**
+    IPアドレスとドメイン名の対応を定義する。
+
+    ```bash
+    # /etc/bind/db.corp.local を新規作成
+    sudo nano /etc/bind/db.corp.local
+    ```
+    ```text
+        604800
+    @       IN      SOA     intdns.corp.local. root.corp.local. (
+                                  2         ; Serial
+                             604800         ; Refresh
+                              86400         ; Retry
+                            2419200         ; Expire
+                             604800 )       ; Negative Cache TTL
+    ;
+    @       IN      NS      intdns.corp.local.
+    intdns  IN      A       192.168.0.53
+    intweb  IN      A       192.168.0.80
+    ```
+
+4.  **設定を反映させ、動作を確認する。**
+    ```bash
+    # 設定ファイルの文法チェック
+    sudo named-checkconf
+    # ゾーンファイルの文法チェック
+    sudo named-checkzone corp.local /etc/bind/db.corp.local
+    # BIND9を再起動
+    sudo systemctl restart bind9
+    ```
+
+### ステップ5：DNSによる名前解決の確認
+
+1.  **クライアントのDNS設定を変更する。**
+    ClientAが、構築したIntDNSサーバーに名前解決を問い合わせるように設定する。
+    ```bash
+    # ClientAで実行
+    # /etc/resolv.conf の nameserver をIntDNSのアドレスに書き換える
+    echo "nameserver 192.168.0.53" | sudo tee /etc/resolv.conf
+    ```
+
+2.  **名前解決をテストする。**
+    `nslookup` コマンドで、`intweb.corp.local` のIPアドレスが正しく引けるか確認する。
+    ```bash
+    # ClientAで実行
+    nslookup intweb.corp.local
+    ```
+    `Server: 192.168.0.53` と `Address: 192.168.0.80` が表示されれば成功である。
+
+3.  **名前での `ping` を試す。**
+    最後に、IPアドレスの代わりに名前で `ping` が通ることを確認する。
+    ```bash
+    ping intweb.corp.local
+    ```
+
+これで第1回の実験は終了である。ここまでの設定と確認結果をレポートにまとめよ。

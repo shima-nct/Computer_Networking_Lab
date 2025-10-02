@@ -1,0 +1,7 @@
+---
+---
+{{< include experiment_design.qmd >}}
+{{< include experiment_manual_1.qmd >}}
+{{< include experiment_manual_2.qmd >}}
+{{< include report_assignment.qmd >}}
+{{< include linux_command_cheatsheet.qmd >}}
