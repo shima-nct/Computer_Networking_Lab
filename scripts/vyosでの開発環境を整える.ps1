@@ -1,0 +1,1 @@
+Copy-ID vyos@<your-vyos-ip>
