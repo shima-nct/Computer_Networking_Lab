@@ -23,6 +23,11 @@ https://github.com/cli/cli/blob/trunk/docs/install_windows.md#winget
 
 https://microsoft.github.io/vscode-essentials/en/01-getting-started.html
 
+## Auto Saveの設定
+https://code.visualstudio.com/docs/editing/codebasics#_save-auto-save
+
+
+
 # WSL/Ubuntu 24.04のインストール
 
 ## WSLの確認
