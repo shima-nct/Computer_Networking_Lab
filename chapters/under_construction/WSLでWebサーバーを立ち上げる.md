@@ -69,7 +69,7 @@ Hyper-V 外部スイッチを作成（WSLBridge という名前で作るのが�
 
 有線にぶら下げる例:
 ```
-New-VMSwitch -Name "WSLBridge" -NetAdapterName "イーサーネット" -AllowManagementOS $true
+New-VMSwitch -Name "WSLBridge" -NetAdapterName "イーサネット" -AllowManagementOS $true
 ```
 
 %USERPROFILE%\.wslconfig を作成または編集して、以下を追記：
