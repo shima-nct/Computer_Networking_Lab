@@ -25,7 +25,7 @@ configure
 
 # LAN 192.168.21.0/24 から出ていく通信を eth0 のIPに変換する
 ```
-set nat source rule 100 outbound-interface 'eth0'
+set nat source rule 100 outbound-interface name 'eth0'
 set nat source rule 100 source address '192.168.21.0/24'
 set nat source rule 100 translation address 'masquerade'
 
