@@ -18,7 +18,20 @@ Windowsホスト：192.168.60.10
 
 まずWSL(Ubuntu)で任意の静的コンテンツ用ディレクトリを作り、簡単なHTTPサーバを起動します。
 
+# インストールできるLinuxの一覧
+```
+wsl --list --online
+
+```
+
+# インストール
+```
+wsl --install -d Ubuntu-24.04
+```
+
+
 # Ubuntu (WSL) 側
+```
 cd ~
 mkdir -p www
 echo "Hello from WSL2 Static Server" > www/index.html
@@ -26,11 +39,11 @@ echo "Hello from WSL2 Static Server" > www/index.html
 # ポート8000で起動（例：Python）
 cd www
 python3 -m http.server 8000
-
+```
 
 ローカルで http://localhost:8000 にアクセスして表示できればOKです。
 
-② WSL 側の IP を固定する（同一L2ネットワーク内で）
+# WSL 側の IP を固定する（同一L2ネットワーク内で）
 
 WSL2 の標準ネットワークはNATで、毎回IPが変わります。
 以下の手順で、「Hyper-V 仮想スイッチ」経由でLANに直接参加する設定をします。
@@ -40,38 +53,41 @@ WSL2 の標準ネットワークはNATで、毎回IPが変わります。
 PowerShell（管理者）で実行：
 
 # 仮想スイッチを新規作成（例：Wi-Fiを共有）
+```
 New-VMSwitch -SwitchName "WSLBridge" -NetAdapterName "Wi-Fi" -AllowManagementOS $true
-
+```
 
 有線LANなら -NetAdapterName "Ethernet" など適宜置き換え。
 
 2. WSL のネットワーク設定を開く
 
+```
 %USERPROFILE%\.wslconfig を作成または編集して、以下を追記：
 
 [wsl2]
 networkingMode=bridged
 vmSwitch=WSLBridge
-
+```
 
 networkingMode=bridged により、WSL VM がホストと同一L2ネットワークに直結されます。
 
 その後WSLを再起動：
-
+```
 wsl --shutdown
 wsl
+```
 
 3. WSL 側で固定IPを割り当て
 
 Ubuntu (WSL) 側で netplan または systemd-networkd を使って静的IPを設定します。
 最近のUbuntu 24.04では /etc/systemd/network/eth0.network が多いです。
-
+```
 sudo mkdir -p /etc/systemd/network
 sudo nano /etc/systemd/network/eth0.network
-
+```
 
 内容例：
-
+```
 [Match]
 Name=eth0
 
@@ -79,12 +95,13 @@ Name=eth0
 Address=192.168.21.10/24
 Gateway=192.168.21.1
 DNS=192.168.21.1
-
+```
 
 適用して再起動：
-
+```
 sudo systemctl restart systemd-networkd
 ip addr show eth0
+```
 
 
 192.168.21.10 が割り当たっていればOKです。
@@ -96,8 +113,9 @@ WSLが直接LANに参加しているので、ポートフォワードは不要�
 ただし、WSL内のポートをWindowsのファイアウォールがブロックすることがあります。
 
 以下でポート8000を許可：
-
+```
 netsh advfirewall firewall add rule name="WSL Static Web" dir=in action=allow protocol=TCP localport=8000
+```
 
 # ゲートウェイ越えでアクセス確認
 
@@ -112,14 +130,14 @@ http://192.168.21.10:8000
 
 もし bridged が難しい場合、従来のNATモードでポートフォワードを使う方法もあります。
 PowerShellで以下のようにルールを追加：
-
+```
 netsh interface portproxy add v4tov4 listenaddress=0.0.0.0 listenport=8000 connectaddress=127.0.0.1 connectport=8000
-
+```
 
 さらにファイアウォール許可：
-
+```
 netsh advfirewall firewall add rule name="WSL NAT Port 8000" dir=in action=allow protocol=TCP localport=8000
-
+```
 
 この場合は WindowsホストのIP にアクセスします（例：http://192.168.21.10:8000）。
 
