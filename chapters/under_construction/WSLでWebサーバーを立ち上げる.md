@@ -52,14 +52,13 @@ WSL2 の標準ネットワークはNATで、毎回IPが変わります。
 
 PowerShell（管理者）で実行：
 
-# 仮想スイッチを新規作成（例：Wi-Fiを共有）
-```
-New-VMSwitch -SwitchName "WSLBridge" -NetAdapterName "Wi-Fi" -AllowManagementOS $true
-```
-
-有線LANなら -NetAdapterName "Ethernet" など適宜置き換え。
-
 2. WSL のネットワーク設定を開く
+
+```
+Get-WindowsOptionalFeature -Online -FeatureName Microsoft-Hyper-V-All, VirtualMachinePlatform
+New-VMSwitch -Name "WSLBridge" -NetAdapterName "Ethernet" -AllowManagementOS $true
+
+```
 
 ```
 %USERPROFILE%\.wslconfig を作成または編集して、以下を追記：
