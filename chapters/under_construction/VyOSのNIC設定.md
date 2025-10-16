@@ -10,9 +10,11 @@ Configuration モード（設定モード）	ルータの本格的な設定変�
 
 運用モードから次のコマンドで設定モードに入ります：
 
+```
 vyos@vyos:~$ configure
 [edit]
 vyos@vyos#
+```
 
 
 [edit] と表示され、プロンプト末尾が # になるのが目印です。
@@ -110,24 +112,45 @@ save コマンドでこのファイルに書き込まれます。
 configure
 
 ## WAN側（DHCP）
+```
 set interfaces ethernet eth0 address 192.168.1.21/24
 set interfaces ethernet eth0 hw-id bc:24:11:6a:42:bf
+```
 
 ## LAN側（静的）
+```
 set interfaces ethernet eth1 address 192.168.21.1/24
 set interfaces ethernet eth1 hw-id bc:24:11:a9:3f:0d
+```
 
 ## デフォルトルート（WANへ）
+```
 set protocols static route 0.0.0.0/0 next-hop 192.168.1.1
-
 commit
 save
 exit
+```
 
 # 10. トラブル時の確認コマンド
 目的	コマンド
-インタフェースの状態確認	show interfaces
-DHCPリースの確認	run show dhcp client leases
-ルーティングテーブル	show ip route
-設定の差分確認	compare
-設定ファイルの確認	cat /config/config.boot
+インタフェースの状態確認	
+```
+show interfaces
+```
+
+DHCPリースの確認	
+```
+run show dhcp client leases
+```
+ルーティングテーブル	
+```
+show ip route
+```
+設定の差分確認	
+```
+compare
+```
+設定ファイルの確認	
+```
+cat /config/config.boot
+```
