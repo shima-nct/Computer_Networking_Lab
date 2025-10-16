@@ -1,58 +1,63 @@
 graph LR
-    %% WAN セグメント
-    WAN[WAN\n192.168.1.0/24]
 
-    %% ゲートウェイ群
-    subgraph GW群
-        GW1[GW1<br>eth0:192.168.1.21<br>eth1:192.168.21.1]
-        GW2[GW2<br>eth0:192.168.1.22<br>eth1:192.168.22.1]
-        GW3[GW3<br>eth0:192.168.1.23<br>eth1:192.168.23.1]
-        GW4[GW4<br>eth0:192.168.1.24<br>eth1:192.168.24.1]
-        GW5[GW5<br>eth0:192.168.1.25<br>eth1:192.168.25.1]
-    end
+  %% ===== WAN =====
+  WAN["WAN\n192.168.1.0/24"]
 
-    WAN --- GW1
-    WAN --- GW2
-    WAN --- GW3
-    WAN --- GW4
-    WAN --- GW5
+  %% ===== Gateways =====
+  subgraph GW_Cluster["Gateways"]
+    GW1["GW1\neth0: 192.168.1.21\neth1: 192.168.21.1"]
+    GW2["GW2\neth0: 192.168.1.22\neth1: 192.168.22.1"]
+    GW3["GW3\neth0: 192.168.1.23\neth1: 192.168.23.1"]
+    GW4["GW4\neth0: 192.168.1.24\neth1: 192.168.24.1"]
+    GW5["GW5\neth0: 192.168.1.25\neth1: 192.168.25.1"]
+  end
 
-    %% LANセグメントとWebサーバー
-    subgraph Net1[Net1 LAN\n192.168.21.0/24]
-        WS1[WebServer\n192.168.21.10:8000]
-        C1[Client(s)]
-    end
+  WAN --- GW1
+  WAN --- GW2
+  WAN --- GW3
+  WAN --- GW4
+  WAN --- GW5
 
-    subgraph Net2[Net2 LAN\n192.168.22.0/24]
-        WS2[WebServer\n192.168.22.10:8000]
-        C2[Client(s)]
-    end
+  %% ===== Net1 =====
+  subgraph Net1["Net1 LAN\n192.168.21.0/24"]
+    WS1["WebServer\n192.168.21.10:8000"]
+    C1["Clients"]
+  end
 
-    subgraph Net3[Net3 LAN\n192.168.23.0/24]
-        WS3[WebServer\n192.168.23.10:8000]
-        C3[Client(s)]
-    end
+  %% ===== Net2 =====
+  subgraph Net2["Net2 LAN\n192.168.22.0/24"]
+    WS2["WebServer\n192.168.22.10:8000"]
+    C2["Clients"]
+  end
 
-    subgraph Net4[Net4 LAN\n192.168.24.0/24]
-        WS4[WebServer\n192.168.24.10:8000]
-        C4[Client(s)]
-    end
+  %% ===== Net3 =====
+  subgraph Net3["Net3 LAN\n192.168.23.0/24"]
+    WS3["WebServer\n192.168.23.10:8000"]
+    C3["Clients"]
+  end
 
-    subgraph Net5[Net5 LAN\n192.168.25.0/24]
-        WS5[WebServer\n192.168.25.10:8000]
-        C5[Client(s)]
-    end
+  %% ===== Net4 =====
+  subgraph Net4["Net4 LAN\n192.168.24.0/24"]
+    WS4["WebServer\n192.168.24.10:8000"]
+    C4["Clients"]
+  end
 
-    %% GWとLANの接続
-    GW1 --- Net1
-    GW2 --- Net2
-    GW3 --- Net3
-    GW4 --- Net4
-    GW5 --- Net5
+  %% ===== Net5 =====
+  subgraph Net5["Net5 LAN\n192.168.25.0/24"]
+    WS5["WebServer\n192.168.25.10:8000"]
+    C5["Clients"]
+  end
 
-    %% 外部アクセス表現（注釈）
-    WAN -. HTTP:80 192.168.1.21 .-> GW1
-    WAN -. HTTP:80 192.168.1.22 .-> GW2
-    WAN -. HTTP:80 192.168.1.23 .-> GW3
-    WAN -. HTTP:80 192.168.1.24 .-> GW4
-    WAN -. HTTP:80 192.168.1.25 .-> GW5
+  %% GW <-> LAN
+  GW1 --- Net1
+  GW2 --- Net2
+  GW3 --- Net3
+  GW4 --- Net4
+  GW5 --- Net5
+
+  %% External access notes (labels on edges)
+  WAN -- "HTTP 80 → 192.168.1.21" --> GW1
+  WAN -- "HTTP 80 → 192.168.1.22" --> GW2
+  WAN -- "HTTP 80 → 192.168.1.23" --> GW3
+  WAN -- "HTTP 80 → 192.168.1.24" --> GW4
+  WAN -- "HTTP 80 → 192.168.1.25" --> GW5
