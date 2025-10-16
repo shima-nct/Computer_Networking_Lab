@@ -45,7 +45,7 @@ configure
 
 # WAN側 eth1 の TCP/80 を 内部の 192.168.21.10:80 に転送
 ```
-set nat destination rule 200 inbound-interface 'eth0'
+set nat destination rule 200 inbound-interface name 'eth0'
 set nat destination rule 200 destination port '80'
 set nat destination rule 200 protocol 'tcp'
 set nat destination rule 200 translation address '192.168.21.10'
