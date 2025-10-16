@@ -63,8 +63,8 @@ exit
 設定が正しく適用されているかは、以下で確認します：
 
 ```
-show nat source rules
-show nat destination rules
+show nat source rule
+show nat destination rule
 
 # セッションテーブルを確認
 show nat source translations
