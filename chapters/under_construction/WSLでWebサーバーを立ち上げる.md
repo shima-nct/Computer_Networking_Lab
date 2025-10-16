@@ -60,7 +60,19 @@ New-VMSwitch -Name "WSLBridge" -NetAdapterName "Ethernet" -AllowManagementOS $tr
 
 ```
 
+物理NIC名を確認（有線なら "Ethernet"、無線なら "Wi-Fi" など）
 ```
+Get-NetAdapter | ? Status -eq Up | ft Name, IfIndex, Status
+```
+
+
+Hyper-V 外部スイッチを作成（WSLBridge という名前で作るのがポイント）
+
+有線にぶら下げる例:
+```
+New-VMSwitch -Name "WSLBridge" -NetAdapterName "Ethernet" -AllowManagementOS $true
+```
+
 %USERPROFILE%\.wslconfig を作成または編集して、以下を追記：
 
 [wsl2]
