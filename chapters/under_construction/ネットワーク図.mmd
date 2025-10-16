@@ -5,11 +5,11 @@ graph LR
 
   %% ===== Gateways =====
   subgraph GW_Cluster["Gateways"]
-    GW1["GW1\neth0: 192.168.1.21\neth1: 192.168.21.1"]
-    GW2["GW2\neth0: 192.168.1.22\neth1: 192.168.22.1"]
-    GW3["GW3\neth0: 192.168.1.23\neth1: 192.168.23.1"]
-    GW4["GW4\neth0: 192.168.1.24\neth1: 192.168.24.1"]
-    GW5["GW5\neth0: 192.168.1.25\neth1: 192.168.25.1"]
+    GW1["GW1\neth0: 192.168.0.21\neth1: 192.168.21.1"]
+    GW2["GW2\neth0: 192.168.0.22\neth1: 192.168.22.1"]
+    GW3["GW3\neth0: 192.168.0.23\neth1: 192.168.23.1"]
+    GW4["GW4\neth0: 192.168.0.24\neth1: 192.168.24.1"]
+    GW5["GW5\neth0: 192.168.0.25\neth1: 192.168.25.1"]
   end
 
   WAN --- GW1
@@ -56,8 +56,8 @@ graph LR
   GW5 --- Net5
 
   %% External access notes (labels on edges)
-  WAN -- "HTTP 80 → 192.168.1.21" --> GW1
-  WAN -- "HTTP 80 → 192.168.1.22" --> GW2
-  WAN -- "HTTP 80 → 192.168.1.23" --> GW3
-  WAN -- "HTTP 80 → 192.168.1.24" --> GW4
-  WAN -- "HTTP 80 → 192.168.1.25" --> GW5
+  WAN -- "HTTP 80 → 192.168.0.21" --> GW1
+  WAN -- "HTTP 80 → 192.168.0.22" --> GW2
+  WAN -- "HTTP 80 → 192.168.0.23" --> GW3
+  WAN -- "HTTP 80 → 192.168.0.24" --> GW4
+  WAN -- "HTTP 80 → 192.168.0.25" --> GW5
