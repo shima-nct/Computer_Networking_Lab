@@ -80,6 +80,7 @@ VyOS 自身を DNS として使う場合が多いです。
 configure
 
 # DHCP サーバ設定例
+```
 set service dhcp-server shared-network-name LAN-ETH1 subnet 192.168.10.0/24 default-router 192.168.10.1
 set service dhcp-server shared-network-name LAN-ETH1 subnet 192.168.10.0/24 subnet-id 10
 set service dhcp-server shared-network-name LAN-ETH1 subnet 192.168.10.0/24 range 0 start 192.168.10.100
@@ -87,13 +88,13 @@ set service dhcp-server shared-network-name LAN-ETH1 subnet 192.168.10.0/24 rang
 ```
 
 # DNS サーバとして VyOS 自身を通知
-
+```
 set service dhcp-server shared-network-name LAN-ETH1 subnet 192.168.10.0/24 dns-server 192.168.10.1
 
 commit
 save
 exit
-```3e5
+```
 
 # 4. 動作確認のための便利コマンド
 目的	コマンド
@@ -104,10 +105,10 @@ DHCP クライアントに配布されているDNS確認（Linux）	cat /etc/res
 よくあるハマりポイント
 
 127.0.0.1 に対する問い合わせがタイムアウトする
-　→ listen-address 127.0.0.1 を追加すればローカルからの問い合わせも受けられます：
-
+→ listen-address 127.0.0.1 を追加すればローカルからの問い合わせも受けられます：
+```
 set service dns forwarding listen-address 127.0.0.1
-
+```
 
 systemd-resolved がない
 VyOS は Debian ベースですが、systemd-resolved の stub resolver は基本無効なので、Ubuntu のような 127.0.0.53 は使いません。
@@ -121,6 +122,7 @@ VyOS 自身	set system name-server	VyOS 自身の名前解決
 LAN クライアント向けDNS	set service dns forwarding	ローカルDNSサーバ機能
 DHCP経由でクライアントに配布	set service dhcp-server ... dns-server	自動設定
 🏁 おまけ：簡単な一括設定例（LAN内DNSサーバとして動作）
+```
 configure
 
 # VyOS 自身が上流のDNSを使えるように設定
@@ -139,3 +141,4 @@ set service dhcp-server shared-network-name LAN subnet 192.168.10.0/24 dns-serve
 commit
 save
 exit
+```

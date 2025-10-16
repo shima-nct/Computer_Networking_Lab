@@ -24,6 +24,7 @@ LAN→WANの通信にグローバルIP（またはWANインターフェースの
 configure
 
 # LAN 192.168.21.0/24 から出ていく通信を eth0 のIPに変換する
+```
 set nat source rule 100 outbound-interface 'eth0'
 set nat source rule 100 source address '192.168.21.0/24'
 set nat source rule 100 translation address 'masquerade'
@@ -31,7 +32,7 @@ set nat source rule 100 translation address 'masquerade'
 commit
 save
 exit
-
+```
 
 # masquerade を指定すると、WAN側のアドレスが変動しても自動的にそれを使ってNATします。
 固定IPを持っている場合は、translation address '192.168.21.15' のように固定指定も可能です。
@@ -43,6 +44,7 @@ exit
 configure
 
 # WAN側 eth1 の TCP/80 を 内部の 192.168.21.10:80 に転送
+```
 set nat destination rule 200 inbound-interface 'eth0'
 set nat destination rule 200 destination port '80'
 set nat destination rule 200 protocol 'tcp'
@@ -52,7 +54,7 @@ set nat destination rule 200 translation port '80'
 commit
 save
 exit
-
+```
 
 # この設定に加えて、VyOS自身のファイアウォールでWAN→LANを許可するルールが必要になる場合があります（デフォルトでは外からのアクセスはブロック）。
 
@@ -60,12 +62,14 @@ exit
 
 設定が正しく適用されているかは、以下で確認します：
 
+```
 show nat source rules
 show nat destination rules
 
 # セッションテーブルを確認
 show nat source translations
 show nat destination translations
+```
 
 # ファイアウォールと組み合わせる場合の注意点
 
@@ -77,6 +81,7 @@ NATで宛先を変換してもファイアウォールで許可しなければ�
 
 例：DNATした80番ポートをWANから許可する
 
+```
 configure
 
 set firewall name WAN_LOCAL default-action drop
