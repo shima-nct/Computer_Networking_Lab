@@ -24,18 +24,18 @@ ul.task-list li input[type="checkbox"] {
 </style>
 
 
-<script src="settingup_files/libs/clipboard/clipboard.min.js"></script>
-<script src="settingup_files/libs/quarto-html/quarto.js" type="module"></script>
-<script src="settingup_files/libs/quarto-html/tabsets/tabsets.js" type="module"></script>
-<script src="settingup_files/libs/quarto-html/axe/axe-check.js" type="module"></script>
-<script src="settingup_files/libs/quarto-html/popper.min.js"></script>
-<script src="settingup_files/libs/quarto-html/tippy.umd.min.js"></script>
-<script src="settingup_files/libs/quarto-html/anchor.min.js"></script>
-<link href="settingup_files/libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="settingup_files/libs/quarto-html/quarto-syntax-highlighting-7b89279ff1a6dce999919e0e67d4d9ec.css" rel="stylesheet" id="quarto-text-highlighting-styles">
-<script src="settingup_files/libs/bootstrap/bootstrap.min.js"></script>
-<link href="settingup_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="settingup_files/libs/bootstrap/bootstrap-6b644e33ed36ddf8b552b26d431ef1a9.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script src="experiment_design_files/libs/clipboard/clipboard.min.js"></script>
+<script src="experiment_design_files/libs/quarto-html/quarto.js" type="module"></script>
+<script src="experiment_design_files/libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="experiment_design_files/libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="experiment_design_files/libs/quarto-html/popper.min.js"></script>
+<script src="experiment_design_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="experiment_design_files/libs/quarto-html/anchor.min.js"></script>
+<link href="experiment_design_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="experiment_design_files/libs/quarto-html/quarto-syntax-highlighting-7b89279ff1a6dce999919e0e67d4d9ec.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="experiment_design_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="experiment_design_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="experiment_design_files/libs/bootstrap/bootstrap-6b644e33ed36ddf8b552b26d431ef1a9.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 
 
 <link rel="stylesheet" href="../styles.css">
@@ -45,7 +45,7 @@ ul.task-list li input[type="checkbox"] {
 
 <div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
 <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-<div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="settingup.pdf"><i class="bi bi-file-pdf"></i>PDF</a></li></ul></div></div>
+<div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="experiment_design.pdf"><i class="bi bi-file-pdf"></i>PDF</a></li></ul></div></div>
 <main class="content" id="quarto-document-content">
 
 <header id="title-block-header">
@@ -55,21 +55,246 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
-<section id="sshによるリモート接続" class="level2">
-<h2 class="anchored" data-anchor-id="sshによるリモート接続">sshによるリモート接続</h2>
-<section id="シンプルなssh接続パスワード認証の場合" class="level3">
-<h3 class="anchored" data-anchor-id="シンプルなssh接続パスワード認証の場合">シンプルなssh接続（パスワード認証の場合）</h3>
+<section id="実験概要" class="level1">
+<h1>実験概要</h1>
+<section id="実験の全体目標" class="level2">
+<h2 class="anchored" data-anchor-id="実験の全体目標">1. 実験の全体目標</h2>
+<p>学生は3回の実験（各180分）を通して、多層的な内部ネットワークの構築、静的ルーティング、DNSによる名前解決、そしてNAPTによるインターネット接続までを実践的に体験し、その仕組みを深く理解することを目標とする。</p>
 </section>
-<section id="公開鍵認証によるssh接続" class="level3">
-<h3 class="anchored" data-anchor-id="公開鍵認証によるssh接続">公開鍵認証によるssh接続</h3>
-<p>sshで公開鍵（ペアとなる秘密鍵も作られる）を作り、それをリモートユーザーの <code>~/.ssh/authorized_keys</code> に追加することで、公開鍵認証によるssh接続を確立することができる。公開鍵認証時に暗号化されている秘密鍵を取り出すためににパスワードが必要となるが、このパスワードをしないで秘密鍵をつくっておくと、パスワードなしのログインができるようになる。</p>
-<p>公開鍵をリモートユーザーの <code>~/.ssh/authorized_keys</code> に追加するには、<code>ssh-copy-id</code>コマンドを使用する。しかし、Windows環境では、ssh-copy-idコマンドが標準で提供されていないため、ここではPowerShellモジュールである<code>SSH-Copy-ID</code>を用いる方法を紹介する。なお、このようなスクリプトに頼らなくてもリモート先でエディアをつかって<code>~/.ssh/authorized_keys</code> を編集すれば公開鍵を登録することができる。</p>
-<p><a href="https://www.powershellgallery.com/packages/SSH-Copy-ID/1.0.1"><code>SSH-Copy-ID</code>はPowerShell Gallaryで公開されている</a>。 インストールするには、管理者権限のもと以下のコマンドを実行する。</p>
-<pre><code>Install-Module -Name SSH-Copy-ID</code></pre>
-<p>管理者権限でPowerShellを実行するには、管理者権限で実行されているWindowsターミナルから実行するか、<code>sudo</code>コマンドで実行することができる。</p>
-<p>管理者権限で実行されているWindowsターミナルの起動は、Windowsターミナルを右クリックして「管理者として実行」を選択するで実行することで行える。</p>
-<p><code>sudo</code>コマンドは以下のコマンドでインストールできる。</p>
-<pre><code>winget install sudo</code></pre>
+<section id="ネットワーク構成" class="level2">
+<h2 class="anchored" data-anchor-id="ネットワーク構成">2. ネットワーク構成</h2>
+<p>実験で構築するネットワークの全体像は以下のFigure.1に示す通りである。</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="./images/new_network_diagram.png" class="img-fluid figure-img" style="width:40.0%"></p>
+<figcaption>ネットワーク構成図</figcaption>
+</figure>
+</div>
+<section id="構成要素" class="level3">
+<h3 class="anchored" data-anchor-id="構成要素">2.1. 構成要素</h3>
+<ul>
+<li><strong>インターネット領域（教員準備）:</strong>
+<ul>
+<li><strong>外部DNSサーバー (<code>ExtDNS</code>):</strong> <code>example.com</code> などのドメイン情報を持つDNSサーバー。</li>
+<li><strong>外部Webサーバー (<code>ExtWeb</code>):</strong> インターネット上にあるWebサイトの役割を担うサーバー。</li>
+</ul></li>
+<li><strong>学生構築ネットワーク:</strong>
+<ul>
+<li><strong>ゲートウェイ (<code>GW</code>):</strong> 組織全体の出入り口。WAN側とLAN側を持ち、NAPT機能で内部ネットワークをインターネットに接続する。</li>
+<li><strong>トランジットセグメント:</strong> GWと内部ルーターを接続する中継ネットワーク。</li>
+<li><strong>内部DNSサーバー (<code>IntDNS</code>):</strong> <code>corp.local</code> のような内部ドメインの名前解決を担う。</li>
+<li><strong>内部Webサーバー (<code>IntWeb</code>):</strong> 組織内でのみアクセス可能なWebサーバー。</li>
+<li><strong>ルーター1 (<code>R1</code>) / ルーター2 (<code>R2</code>):</strong> 内部ネットワークをさらにセグメントに分割する。</li>
+<li><strong>クライアントPC A/B:</strong> 各セグメントに属する端末。</li>
+</ul></li>
+</ul>
+</section>
+<section id="ipアドレッシング計画" class="level3">
+<h3 class="anchored" data-anchor-id="ipアドレッシング計画">2.2. IPアドレッシング計画</h3>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 14%">
+<col style="width: 14%">
+<col style="width: 14%">
+<col style="width: 14%">
+<col style="width: 14%">
+<col style="width: 14%">
+<col style="width: 14%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">機器名</th>
+<th style="text-align: left;">役割</th>
+<th style="text-align: left;">インターフェース</th>
+<th style="text-align: left;">IPアドレス</th>
+<th style="text-align: left;">サブネットマスク</th>
+<th style="text-align: left;">デフォルトゲートウェイ</th>
+<th style="text-align: left;">DNSサーバー</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><strong>インターネット領域</strong></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">ExtDNS</td>
+<td style="text-align: left;">外部DNS</td>
+<td style="text-align: left;">-</td>
+<td style="text-align: left;"><code>1.1.1.1</code></td>
+<td style="text-align: left;"><code>255.255.255.0</code></td>
+<td style="text-align: left;">(不明)</td>
+<td style="text-align: left;">(自身)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">ExtWeb</td>
+<td style="text-align: left;">外部Web</td>
+<td style="text-align: left;">-</td>
+<td style="text-align: left;"><code>172.217.19.0</code></td>
+<td style="text-align: left;"><code>255.255.255.0</code></td>
+<td style="text-align: left;">(不明)</td>
+<td style="text-align: left;"><code>216.239.32.10</code>, <code>216.239.34.10</code>,<code>216.239.36.10</code>,<code>216.239.38.10</code></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><strong>学生構築ネットワーク</strong></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">GW</td>
+<td style="text-align: left;">ゲートウェイ</td>
+<td style="text-align: left;">WAN (eth0)</td>
+<td style="text-align: left;"><code>10.0.0.1</code></td>
+<td style="text-align: left;"><code>255.255.255.0</code></td>
+<td style="text-align: left;">(秘匿)</td>
+<td style="text-align: left;">(秘匿)</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">LAN (eth1)</td>
+<td style="text-align: left;"><code>192.168.1.1</code></td>
+<td style="text-align: left;"><code>255.255.255.0</code></td>
+<td style="text-align: left;">-</td>
+<td style="text-align: left;">-</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">IntDNS</td>
+<td style="text-align: left;">内部DNS</td>
+<td style="text-align: left;">eth0</td>
+<td style="text-align: left;"><code>192.168.1.1</code></td>
+<td style="text-align: left;"><code>255.255.255.0</code></td>
+<td style="text-align: left;"><code>192.168.1.1</code></td>
+<td style="text-align: left;">(自身), <code>1.1.1.1</code></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">IntWeb</td>
+<td style="text-align: left;">内部Web</td>
+<td style="text-align: left;">eth0</td>
+<td style="text-align: left;"><code>192.168.1.10</code></td>
+<td style="text-align: left;"><code>255.255.255.0</code></td>
+<td style="text-align: left;">-</td>
+<td style="text-align: left;"><code>192.168.1.1</code></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">R1</td>
+<td style="text-align: left;">ルーター1</td>
+<td style="text-align: left;">WAN (eth0)</td>
+<td style="text-align: left;"><code>192.168.1.21</code></td>
+<td style="text-align: left;"><code>255.255.255.0</code></td>
+<td style="text-align: left;"><code>192.168.1.1</code></td>
+<td style="text-align: left;">-</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">LAN (eth1)</td>
+<td style="text-align: left;"><code>192.168.21.1</code></td>
+<td style="text-align: left;"><code>255.255.255.0</code></td>
+<td style="text-align: left;">-</td>
+<td style="text-align: left;">-</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">R2</td>
+<td style="text-align: left;">ルーター2</td>
+<td style="text-align: left;">WAN</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">(eth0)</td>
+<td style="text-align: left;"><code>192.168.1.22</code></td>
+<td style="text-align: left;"><code>255.255.255.0</code></td>
+<td style="text-align: left;"><code>192.168.1.1</code></td>
+<td style="text-align: left;">-</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">LAN (eth1)</td>
+<td style="text-align: left;"><code>192.168.21.1</code></td>
+<td style="text-align: left;"><code>255.255.255.0</code></td>
+<td style="text-align: left;">-</td>
+<td style="text-align: left;">-</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">ClientA</td>
+<td style="text-align: left;">クライアントA</td>
+<td style="text-align: left;">eth0</td>
+<td style="text-align: left;"><code>192.168.21.10</code></td>
+<td style="text-align: left;"><code>255.255.255.0</code></td>
+<td style="text-align: left;"><code>192.168.21.1</code></td>
+<td style="text-align: left;"><code>192.168.21.1</code></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">ClientB</td>
+<td style="text-align: left;">クライアントB</td>
+<td style="text-align: left;">eth0</td>
+<td style="text-align: left;"><code>192.168.22.10</code></td>
+<td style="text-align: left;"><code>255.255.255.0</code></td>
+<td style="text-align: left;"><code>192.168.21.1</code></td>
+<td style="text-align: left;"><code>192.168.21.1</code></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="各回の実験テーマ" class="level2">
+<h2 class="anchored" data-anchor-id="各回の実験テーマ">3. 各回の実験テーマ</h2>
+<section id="第1回内部ネットワークの構築と静的ルーティング" class="level3">
+<h3 class="anchored" data-anchor-id="第1回内部ネットワークの構築と静的ルーティング">第1回：内部ネットワークの構築と静的ルーティング</h3>
+<ul>
+<li><strong>目標:</strong> ゲートウェイ、内部サーバー、ルーター、クライアントPCを接続し、静的ルーティングによって内部ネットワーク全体の通信を確立する。</li>
+<li><strong>内容:</strong>
+<ol type="1">
+<li>各PC/サーバーへのIPアドレス設定。</li>
+<li>ルーター1およびルーター2でIPフォワーディングを有効化する。</li>
+<li>クライアントPC A/Bにデフォルトゲートウェイを設定する。</li>
+<li>ゲートウェイ(<code>GW</code>)に内部ネットワーク(<code>192.168.1.0/24</code>, <code>192.168.2.0/24</code>)への静的ルートを設定する。</li>
+<li><code>ping</code> と <code>traceroute</code> を用いて ClientA &lt;=&gt; ClientB, ClientA &lt;=&gt; IntWeb などの通信を確認し、パケットの経路を追跡する。</li>
+<li>内部DNSサーバーを構築し、<code>intweb.corp.local</code> のような内部ドメインの名前解決ができることを確認する。</li>
+</ol></li>
+</ul>
+</section>
+<section id="第2回naptによるインターネット接続" class="level3">
+<h3 class="anchored" data-anchor-id="第2回naptによるインターネット接続">第2回：NAPTによるインターネット接続</h3>
+<ul>
+<li><strong>目標:</strong> ゲートウェイにNAPT（IPマスカレード）を設定し、内部ネットワークからインターネット上のサーバーへアクセスできるようにする。</li>
+<li><strong>内容:</strong>
+<ol type="1">
+<li>ゲートウェイ(<code>GW</code>)で <code>iptables</code> を用いてNAPT（IPマスカレード）を設定する。</li>
+<li>クライアントPC Aから外部Webサーバー(<code>10.0.0.80</code>)へ <code>ping</code> が通ることを確認する。</li>
+<li>外部DNSサーバー(<code>10.0.0.53</code>)を利用して <code>www.example.com</code> のような外部ドメインの名前解決ができることを確認する。</li>
+<li>クライアントPC Aのブラウザから外部Webサーバーにアクセスする。</li>
+<li>ゲートウェイで <code>conntrack</code> コマンドや <code>iptables</code> のカウンタを確認し、NAPTによるアドレス変換の様子を観察する。</li>
+</ol></li>
+</ul>
+</section>
+</section>
+<section id="レポート課題" class="level2">
+<h2 class="anchored" data-anchor-id="レポート課題">4. レポート課題</h2>
+<ul>
+<li><strong>考察事項</strong>
+<ul>
+<li>問1: ClientAからClientBへ <code>ping</code> を送信した際、パケットはどのような経路を辿るか。<code>traceroute</code> の結果を基に、各ルーターのルーティングテーブルがどのように利用されるかを説明せよ。</li>
+<li>問2: ゲートウェイ(<code>GW</code>)に内部ネットワーク(<code>192.168.1.0/24</code>, <code>192.168.2.0/24</code>)への静的ルートを設定しない場合、内部WebサーバーからClientAへの通信はなぜ失敗するのか説明せよ。</li>
+<li>問3: NAPTの役割とは何か。内部ネットワークのPCが1つのグローバルIPアドレス(<code>10.0.0.1</code>)を使ってインターネットと通信できる仕組みを、実験結果を交えて説明せよ。</li>
+<li>問4: 内部DNSと外部DNSの役割の違いは何か。ClientAが <code>intweb.corp.local</code> と <code>www.example.com</code> の両方にアクセスできるのはなぜか、名前解決のプロセスを追って説明せよ。</li>
+</ul></li>
+</ul>
 </section>
 </section>
 

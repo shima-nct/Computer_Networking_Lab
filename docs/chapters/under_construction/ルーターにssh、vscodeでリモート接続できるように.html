@@ -24,28 +24,28 @@ ul.task-list li input[type="checkbox"] {
 </style>
 
 
-<script src="settingup_files/libs/clipboard/clipboard.min.js"></script>
-<script src="settingup_files/libs/quarto-html/quarto.js" type="module"></script>
-<script src="settingup_files/libs/quarto-html/tabsets/tabsets.js" type="module"></script>
-<script src="settingup_files/libs/quarto-html/axe/axe-check.js" type="module"></script>
-<script src="settingup_files/libs/quarto-html/popper.min.js"></script>
-<script src="settingup_files/libs/quarto-html/tippy.umd.min.js"></script>
-<script src="settingup_files/libs/quarto-html/anchor.min.js"></script>
-<link href="settingup_files/libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="settingup_files/libs/quarto-html/quarto-syntax-highlighting-7b89279ff1a6dce999919e0e67d4d9ec.css" rel="stylesheet" id="quarto-text-highlighting-styles">
-<script src="settingup_files/libs/bootstrap/bootstrap.min.js"></script>
-<link href="settingup_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="settingup_files/libs/bootstrap/bootstrap-6b644e33ed36ddf8b552b26d431ef1a9.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script src="ルーターにssh、vscodeでリモート接続できるように_files/libs/clipboard/clipboard.min.js"></script>
+<script src="ルーターにssh、vscodeでリモート接続できるように_files/libs/quarto-html/quarto.js" type="module"></script>
+<script src="ルーターにssh、vscodeでリモート接続できるように_files/libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="ルーターにssh、vscodeでリモート接続できるように_files/libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="ルーターにssh、vscodeでリモート接続できるように_files/libs/quarto-html/popper.min.js"></script>
+<script src="ルーターにssh、vscodeでリモート接続できるように_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="ルーターにssh、vscodeでリモート接続できるように_files/libs/quarto-html/anchor.min.js"></script>
+<link href="ルーターにssh、vscodeでリモート接続できるように_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="ルーターにssh、vscodeでリモート接続できるように_files/libs/quarto-html/quarto-syntax-highlighting-7b89279ff1a6dce999919e0e67d4d9ec.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="ルーターにssh、vscodeでリモート接続できるように_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="ルーターにssh、vscodeでリモート接続できるように_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="ルーターにssh、vscodeでリモート接続できるように_files/libs/bootstrap/bootstrap-6b644e33ed36ddf8b552b26d431ef1a9.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 
 
-<link rel="stylesheet" href="../styles.css">
+<link rel="stylesheet" href="../../styles.css">
 </head>
 
 <body class="quarto-light">
 
 <div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
 <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-<div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="settingup.pdf"><i class="bi bi-file-pdf"></i>PDF</a></li></ul></div></div>
+<div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="ルーターにssh、vscodeでリモート接続できるように.pdf"><i class="bi bi-file-pdf"></i>PDF</a></li></ul></div></div>
 <main class="content" id="quarto-document-content">
 
 <header id="title-block-header">
@@ -55,21 +55,57 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
-<section id="sshによるリモート接続" class="level2">
-<h2 class="anchored" data-anchor-id="sshによるリモート接続">sshによるリモート接続</h2>
-<section id="シンプルなssh接続パスワード認証の場合" class="level3">
-<h3 class="anchored" data-anchor-id="シンプルなssh接続パスワード認証の場合">シンプルなssh接続（パスワード認証の場合）</h3>
+<section id="キーボードについての注意" class="level1">
+<h1>キーボードについての注意</h1>
+<p>https://ja.wikipedia.org/wiki/%E3%82%AD%E3%83%BC%E9%85%8D%E5%88%97</p>
 </section>
-<section id="公開鍵認証によるssh接続" class="level3">
-<h3 class="anchored" data-anchor-id="公開鍵認証によるssh接続">公開鍵認証によるssh接続</h3>
-<p>sshで公開鍵（ペアとなる秘密鍵も作られる）を作り、それをリモートユーザーの <code>~/.ssh/authorized_keys</code> に追加することで、公開鍵認証によるssh接続を確立することができる。公開鍵認証時に暗号化されている秘密鍵を取り出すためににパスワードが必要となるが、このパスワードをしないで秘密鍵をつくっておくと、パスワードなしのログインができるようになる。</p>
-<p>公開鍵をリモートユーザーの <code>~/.ssh/authorized_keys</code> に追加するには、<code>ssh-copy-id</code>コマンドを使用する。しかし、Windows環境では、ssh-copy-idコマンドが標準で提供されていないため、ここではPowerShellモジュールである<code>SSH-Copy-ID</code>を用いる方法を紹介する。なお、このようなスクリプトに頼らなくてもリモート先でエディアをつかって<code>~/.ssh/authorized_keys</code> を編集すれば公開鍵を登録することができる。</p>
-<p><a href="https://www.powershellgallery.com/packages/SSH-Copy-ID/1.0.1"><code>SSH-Copy-ID</code>はPowerShell Gallaryで公開されている</a>。 インストールするには、管理者権限のもと以下のコマンドを実行する。</p>
-<pre><code>Install-Module -Name SSH-Copy-ID</code></pre>
-<p>管理者権限でPowerShellを実行するには、管理者権限で実行されているWindowsターミナルから実行するか、<code>sudo</code>コマンドで実行することができる。</p>
-<p>管理者権限で実行されているWindowsターミナルの起動は、Windowsターミナルを右クリックして「管理者として実行」を選択するで実行することで行える。</p>
-<p><code>sudo</code>コマンドは以下のコマンドでインストールできる。</p>
-<pre><code>winget install sudo</code></pre>
+<section id="nicの確認" class="level1">
+<h1>NICの確認</h1>
+<pre><code>ip addr show eth0
+ip addr show eth1</code></pre>
+</section>
+<section id="ipアドレスの設定" class="level1">
+<h1>IPアドレスの設定</h1>
+<pre><code>ip addr add 192.168.0.301/24 dev eth0
+ip addr add 192.168.1.1/24 dev eth1</code></pre>
+</section>
+<section id="ルーティングテーブルの設定" class="level1">
+<h1>ルーティングテーブルの設定</h1>
+<pre><code>route add default via 192.168.0.1</code></pre>
+</section>
+<section id="名前解決のための設定" class="level1">
+<h1>名前解決のための設定</h1>
+<pre><code>vi /etc/resolv.conf</code></pre>
+<pre><code>nameserver 192.168.0.1</code></pre>
+</section>
+<section id="疎通確認" class="level1">
+<h1>疎通確認</h1>
+<pre><code>ping 192.168.0.1
+ping 1.1.1.1</code></pre>
+</section>
+<section id="名前解決の確認" class="level1">
+<h1>名前解決の確認</h1>
+<pre><code>nslookup google.com</code></pre>
+</section>
+<section id="sshの設定" class="level1">
+<h1>sshの設定</h1>
+<pre><code>sudo apt update
+sudo apt install openssh-server</code></pre>
+</section>
+<section id="windowsからvscodeでリモート接続するための設定" class="level1">
+<h1>WindowsからVSCodeでリモート接続するための設定</h1>
+<pre><code>copy-id vyos@192.168.0.301</code></pre>
+</section>
+<section id="vscodeを起動する" class="level1">
+<h1>VSCodeを起動する。</h1>
+</section>
+<section id="vscodeからリモート接続" class="level1">
+<h1>VSCodeからリモート接続</h1>
+</section>
+<section id="vscodeの設定" class="level1">
+<h1>VSCodeの設定</h1>
+<section id="save-as-root拡張のインストール" class="level2">
+<h2 class="anchored" data-anchor-id="save-as-root拡張のインストール">save as root拡張のインストール</h2>
 </section>
 </section>
 

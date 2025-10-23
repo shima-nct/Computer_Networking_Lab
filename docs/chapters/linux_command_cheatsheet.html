@@ -21,21 +21,56 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
 
 
-<script src="settingup_files/libs/clipboard/clipboard.min.js"></script>
-<script src="settingup_files/libs/quarto-html/quarto.js" type="module"></script>
-<script src="settingup_files/libs/quarto-html/tabsets/tabsets.js" type="module"></script>
-<script src="settingup_files/libs/quarto-html/axe/axe-check.js" type="module"></script>
-<script src="settingup_files/libs/quarto-html/popper.min.js"></script>
-<script src="settingup_files/libs/quarto-html/tippy.umd.min.js"></script>
-<script src="settingup_files/libs/quarto-html/anchor.min.js"></script>
-<link href="settingup_files/libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="settingup_files/libs/quarto-html/quarto-syntax-highlighting-7b89279ff1a6dce999919e0e67d4d9ec.css" rel="stylesheet" id="quarto-text-highlighting-styles">
-<script src="settingup_files/libs/bootstrap/bootstrap.min.js"></script>
-<link href="settingup_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="settingup_files/libs/bootstrap/bootstrap-6b644e33ed36ddf8b552b26d431ef1a9.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script src="linux_command_cheatsheet_files/libs/clipboard/clipboard.min.js"></script>
+<script src="linux_command_cheatsheet_files/libs/quarto-html/quarto.js" type="module"></script>
+<script src="linux_command_cheatsheet_files/libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="linux_command_cheatsheet_files/libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="linux_command_cheatsheet_files/libs/quarto-html/popper.min.js"></script>
+<script src="linux_command_cheatsheet_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="linux_command_cheatsheet_files/libs/quarto-html/anchor.min.js"></script>
+<link href="linux_command_cheatsheet_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="linux_command_cheatsheet_files/libs/quarto-html/quarto-syntax-highlighting-7b89279ff1a6dce999919e0e67d4d9ec.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="linux_command_cheatsheet_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="linux_command_cheatsheet_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="linux_command_cheatsheet_files/libs/bootstrap/bootstrap-6b644e33ed36ddf8b552b26d431ef1a9.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 
 
 <link rel="stylesheet" href="../styles.css">
@@ -45,7 +80,7 @@ ul.task-list li input[type="checkbox"] {
 
 <div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
 <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-<div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="settingup.pdf"><i class="bi bi-file-pdf"></i>PDF</a></li></ul></div></div>
+<div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="linux_command_cheatsheet.pdf"><i class="bi bi-file-pdf"></i>PDF</a></li></ul></div></div>
 <main class="content" id="quarto-document-content">
 
 <header id="title-block-header">
@@ -55,21 +90,75 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
-<section id="sshによるリモート接続" class="level2">
-<h2 class="anchored" data-anchor-id="sshによるリモート接続">sshによるリモート接続</h2>
-<section id="シンプルなssh接続パスワード認証の場合" class="level3">
-<h3 class="anchored" data-anchor-id="シンプルなssh接続パスワード認証の場合">シンプルなssh接続（パスワード認証の場合）</h3>
+<section id="補助資料1linuxネットワークコマンド-チートシート" class="level1">
+<h1>補助資料1：Linuxネットワークコマンド チートシート</h1>
+<p>この資料は、実験で使用する主要なLinuxネットワークコマンドの基本的な使い方をまとめたものである。より複雑なネットワークに対応するため、<code>iptables</code> や <code>bind9</code> 関連のコマンドを追加している。</p>
+<section id="ip-コマンド-基本" class="level2">
+<h2 class="anchored" data-anchor-id="ip-コマンド-基本">1. <code>ip</code> コマンド (基本)</h2>
+<p>ネットワークインターフェースやルーティングテーブルを管理する基本コマンドである。</p>
+<ul>
+<li><p><strong>インターフェースとIPアドレスの表示</strong> <code>bash     ip address show     # 短縮形: ip a</code></p></li>
+<li><p><strong>IPアドレスの追加</strong> (例: <code>192.168.1.10/24</code> を <code>eth0</code> に) <code>bash     sudo ip addr add 192.168.1.10/24 dev eth0</code></p></li>
+<li><p><strong>ルーティングテーブルの表示</strong> <code>bash     ip route show     # 短縮形: ip r</code></p></li>
+<li><p><strong>デフォルトゲートウェイの追加</strong> (例: <code>192.168.1.1</code>) <code>bash     sudo ip route add default via 192.168.1.1</code></p></li>
+<li><p><strong>静的ルートの追加</strong> (例: <code>192.168.1.0/24</code> へのパケットを <code>192.168.0.11</code> へ転送) <code>bash     sudo ip route add 192.168.1.0/24 via 192.168.0.11</code></p></li>
+</ul>
 </section>
-<section id="公開鍵認証によるssh接続" class="level3">
-<h3 class="anchored" data-anchor-id="公開鍵認証によるssh接続">公開鍵認証によるssh接続</h3>
-<p>sshで公開鍵（ペアとなる秘密鍵も作られる）を作り、それをリモートユーザーの <code>~/.ssh/authorized_keys</code> に追加することで、公開鍵認証によるssh接続を確立することができる。公開鍵認証時に暗号化されている秘密鍵を取り出すためににパスワードが必要となるが、このパスワードをしないで秘密鍵をつくっておくと、パスワードなしのログインができるようになる。</p>
-<p>公開鍵をリモートユーザーの <code>~/.ssh/authorized_keys</code> に追加するには、<code>ssh-copy-id</code>コマンドを使用する。しかし、Windows環境では、ssh-copy-idコマンドが標準で提供されていないため、ここではPowerShellモジュールである<code>SSH-Copy-ID</code>を用いる方法を紹介する。なお、このようなスクリプトに頼らなくてもリモート先でエディアをつかって<code>~/.ssh/authorized_keys</code> を編集すれば公開鍵を登録することができる。</p>
-<p><a href="https://www.powershellgallery.com/packages/SSH-Copy-ID/1.0.1"><code>SSH-Copy-ID</code>はPowerShell Gallaryで公開されている</a>。 インストールするには、管理者権限のもと以下のコマンドを実行する。</p>
-<pre><code>Install-Module -Name SSH-Copy-ID</code></pre>
-<p>管理者権限でPowerShellを実行するには、管理者権限で実行されているWindowsターミナルから実行するか、<code>sudo</code>コマンドで実行することができる。</p>
-<p>管理者権限で実行されているWindowsターミナルの起動は、Windowsターミナルを右クリックして「管理者として実行」を選択するで実行することで行える。</p>
-<p><code>sudo</code>コマンドは以下のコマンドでインストールできる。</p>
-<pre><code>winget install sudo</code></pre>
+<section id="ping-traceroute-疎通確認" class="level2">
+<h2 class="anchored" data-anchor-id="ping-traceroute-疎通確認">2. <code>ping</code> &amp; <code>traceroute</code> (疎通確認)</h2>
+<ul>
+<li><p><strong>指定ホストとの疎通確認</strong> <code>bash     ping 192.168.1.10</code></p></li>
+<li><p><strong>指定ホストまでの経路追跡</strong> <code>bash     traceroute 192.168.1.10</code></p></li>
+</ul>
+</section>
+<section id="iptables-ファイアウォール-napt" class="level2">
+<h2 class="anchored" data-anchor-id="iptables-ファイアウォール-napt">3. <code>iptables</code> (ファイアウォール &amp; NAPT)</h2>
+<p>Linuxカーネルのパケットフィルタリング機能（Netfilter）を操作するコマンドであり、NAPTの設定に用いる。</p>
+<ul>
+<li><p><strong>現在のNATテーブルのルールを表示</strong> <code>bash     sudo iptables -t nat -L -v</code></p></li>
+<li><p><strong>NAPT（IPマスカレード）ルールの追加</strong> (WAN側インターフェースが <code>eth0</code> の場合、<code>eth0</code> から出ていくパケットの送信元を <code>eth0</code> のIPアドレスに書き換える) <code>bash     sudo iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE</code></p></li>
+<li><p><strong>NATテーブルのルールをすべて削除</strong> <code>bash     sudo iptables -t nat -F</code></p></li>
+</ul>
+</section>
+<section id="conntrack-コネクショントラッキング" class="level2">
+<h2 class="anchored" data-anchor-id="conntrack-コネクショントラッキング">4. <code>conntrack</code> (コネクショントラッキング)</h2>
+<p>NAPTによって変換されている通信セッションの状態を確認できる。</p>
+<ul>
+<li><p><strong><code>conntrack</code> ツールのインストール</strong> <code>bash     sudo apt update     sudo apt install conntrack</code></p></li>
+<li><p><strong>現在のコネクショントラックテーブルを表示</strong> <code>bash     sudo conntrack -L</code></p></li>
+<li><p><strong>特定の送信元IPアドレスでフィルタリング</strong> (例: ClientA <code>192.168.1.10</code>) <code>bash     sudo conntrack -L -s 192.168.1.10</code></p></li>
+</ul>
+</section>
+<section id="bind9-dnsサーバー" class="level2">
+<h2 class="anchored" data-anchor-id="bind9-dnsサーバー">5. BIND9 (DNSサーバー)</h2>
+<p>DNSサーバー <code>BIND9</code> の管理用コマンドをまとめる。</p>
+<ul>
+<li><p><strong>BIND9のインストール</strong> <code>bash     sudo apt update     sudo apt install bind9</code></p></li>
+<li><p><strong>設定ファイルの構文チェック</strong> <code>bash     sudo named-checkconf</code></p></li>
+<li><p><strong>ゾーンファイルの構文チェック</strong> (例: <code>corp.local</code> ゾーン) <code>bash     sudo named-checkzone corp.local /etc/bind/db.corp.local</code></p></li>
+<li><p><strong>BIND9サービスの再起動</strong> <code>bash     sudo systemctl restart bind9</code></p></li>
+<li><p><strong>BIND9サービスのステータス確認</strong> <code>bash     sudo systemctl status bind9</code></p></li>
+</ul>
+</section>
+<section id="nslookup-dig-dnsクライアント" class="level2">
+<h2 class="anchored" data-anchor-id="nslookup-dig-dnsクライアント">6. <code>nslookup</code> &amp; <code>dig</code> (DNSクライアント)</h2>
+<p>DNSサーバーに問い合わせて名前解決を行うコマンドである。</p>
+<ul>
+<li><p><strong><code>nslookup</code> でドメイン名を問い合わせる</strong> <code>bash     nslookup intweb.corp.local</code></p></li>
+<li><p><strong><code>dig</code> で詳細な情報を問い合わせる</strong> <code>bash     dig www.example.com</code></p></li>
+</ul>
+</section>
+<section id="その他" class="level2">
+<h2 class="anchored" data-anchor-id="その他">7. その他</h2>
+<ul>
+<li><p><strong>IPフォワーディングの有効化</strong> (ルーター機能の有効化) <code>bash     sudo sysctl -w net.ipv4.ip_forward=1</code></p></li>
+<li><p><strong>DNSサーバー設定ファイルの確認・編集</strong> (クライアントPCが参照するDNSサーバーのアドレスを管理する)</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 確認</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span> /etc/resolv.conf</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co"># 編集 (例: 192.168.0.53 を指定)</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">"nameserver 192.168.0.53"</span> <span class="kw">|</span> <span class="fu">sudo</span> tee /etc/resolv.conf</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div></li>
+</ul>
 </section>
 </section>
 

@@ -24,28 +24,28 @@ ul.task-list li input[type="checkbox"] {
 </style>
 
 
-<script src="settingup_files/libs/clipboard/clipboard.min.js"></script>
-<script src="settingup_files/libs/quarto-html/quarto.js" type="module"></script>
-<script src="settingup_files/libs/quarto-html/tabsets/tabsets.js" type="module"></script>
-<script src="settingup_files/libs/quarto-html/axe/axe-check.js" type="module"></script>
-<script src="settingup_files/libs/quarto-html/popper.min.js"></script>
-<script src="settingup_files/libs/quarto-html/tippy.umd.min.js"></script>
-<script src="settingup_files/libs/quarto-html/anchor.min.js"></script>
-<link href="settingup_files/libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="settingup_files/libs/quarto-html/quarto-syntax-highlighting-7b89279ff1a6dce999919e0e67d4d9ec.css" rel="stylesheet" id="quarto-text-highlighting-styles">
-<script src="settingup_files/libs/bootstrap/bootstrap.min.js"></script>
-<link href="settingup_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="settingup_files/libs/bootstrap/bootstrap-6b644e33ed36ddf8b552b26d431ef1a9.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script src="WSLでWebサーバーを立ち上げる_files/libs/clipboard/clipboard.min.js"></script>
+<script src="WSLでWebサーバーを立ち上げる_files/libs/quarto-html/quarto.js" type="module"></script>
+<script src="WSLでWebサーバーを立ち上げる_files/libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="WSLでWebサーバーを立ち上げる_files/libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="WSLでWebサーバーを立ち上げる_files/libs/quarto-html/popper.min.js"></script>
+<script src="WSLでWebサーバーを立ち上げる_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="WSLでWebサーバーを立ち上げる_files/libs/quarto-html/anchor.min.js"></script>
+<link href="WSLでWebサーバーを立ち上げる_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="WSLでWebサーバーを立ち上げる_files/libs/quarto-html/quarto-syntax-highlighting-7b89279ff1a6dce999919e0e67d4d9ec.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="WSLでWebサーバーを立ち上げる_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="WSLでWebサーバーを立ち上げる_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="WSLでWebサーバーを立ち上げる_files/libs/bootstrap/bootstrap-6b644e33ed36ddf8b552b26d431ef1a9.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 
 
-<link rel="stylesheet" href="../styles.css">
+<link rel="stylesheet" href="../../styles.css">
 </head>
 
 <body class="quarto-light">
 
 <div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
 <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-<div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="settingup.pdf"><i class="bi bi-file-pdf"></i>PDF</a></li></ul></div></div>
+<div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="WSLでWebサーバーを立ち上げる.pdf"><i class="bi bi-file-pdf"></i>PDF</a></li></ul></div></div>
 <main class="content" id="quarto-document-content">
 
 <header id="title-block-header">
@@ -55,22 +55,108 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
-<section id="sshによるリモート接続" class="level2">
-<h2 class="anchored" data-anchor-id="sshによるリモート接続">sshによるリモート接続</h2>
-<section id="シンプルなssh接続パスワード認証の場合" class="level3">
-<h3 class="anchored" data-anchor-id="シンプルなssh接続パスワード認証の場合">シンプルなssh接続（パスワード認証の場合）</h3>
+<section id="前提条件" class="level1">
+<h1>前提条件</h1>
+<p>Windows 11 上で WSL2（例：Ubuntu 24.04）がインストール済み</p>
+<p>管理者権限がある</p>
+<p>PCは有線LAN or Wi-Fi でルータ／スイッチ配下に接続</p>
+<p>LANセグメント例</p>
+<p>ゲートウェイ（ルータ）：192.168.60.1</p>
+<p>Windowsホスト：192.168.60.10</p>
+<p>予定するWSL固定IP：192.168.60.50（同一セグメント内・未使用）</p>
+<p>① WSL で Web サーバーを用意</p>
+<p>まずWSL(Ubuntu)で任意の静的コンテンツ用ディレクトリを作り、簡単なHTTPサーバを起動します。</p>
 </section>
-<section id="公開鍵認証によるssh接続" class="level3">
-<h3 class="anchored" data-anchor-id="公開鍵認証によるssh接続">公開鍵認証によるssh接続</h3>
-<p>sshで公開鍵（ペアとなる秘密鍵も作られる）を作り、それをリモートユーザーの <code>~/.ssh/authorized_keys</code> に追加することで、公開鍵認証によるssh接続を確立することができる。公開鍵認証時に暗号化されている秘密鍵を取り出すためににパスワードが必要となるが、このパスワードをしないで秘密鍵をつくっておくと、パスワードなしのログインができるようになる。</p>
-<p>公開鍵をリモートユーザーの <code>~/.ssh/authorized_keys</code> に追加するには、<code>ssh-copy-id</code>コマンドを使用する。しかし、Windows環境では、ssh-copy-idコマンドが標準で提供されていないため、ここではPowerShellモジュールである<code>SSH-Copy-ID</code>を用いる方法を紹介する。なお、このようなスクリプトに頼らなくてもリモート先でエディアをつかって<code>~/.ssh/authorized_keys</code> を編集すれば公開鍵を登録することができる。</p>
-<p><a href="https://www.powershellgallery.com/packages/SSH-Copy-ID/1.0.1"><code>SSH-Copy-ID</code>はPowerShell Gallaryで公開されている</a>。 インストールするには、管理者権限のもと以下のコマンドを実行する。</p>
-<pre><code>Install-Module -Name SSH-Copy-ID</code></pre>
-<p>管理者権限でPowerShellを実行するには、管理者権限で実行されているWindowsターミナルから実行するか、<code>sudo</code>コマンドで実行することができる。</p>
-<p>管理者権限で実行されているWindowsターミナルの起動は、Windowsターミナルを右クリックして「管理者として実行」を選択するで実行することで行える。</p>
-<p><code>sudo</code>コマンドは以下のコマンドでインストールできる。</p>
-<pre><code>winget install sudo</code></pre>
+<section id="インストールできるlinuxの一覧" class="level1">
+<h1>インストールできるLinuxの一覧</h1>
+<pre><code>wsl --list --online
+</code></pre>
 </section>
+<section id="インストール" class="level1">
+<h1>インストール</h1>
+<pre><code>wsl --install -d Ubuntu-24.04</code></pre>
+</section>
+<section id="ubuntu-wsl-側" class="level1">
+<h1>Ubuntu (WSL) 側</h1>
+<pre><code>cd ~
+mkdir -p www
+echo "Hello from WSL2 Static Server" &gt; www/index.html
+
+# ポート8000で起動（例：Python）
+cd www
+python3 -m http.server 8000</code></pre>
+<p>ローカルで http://localhost:8000 にアクセスして表示できればOKです。</p>
+</section>
+<section id="wsl-側の-ip-を固定する同一l2ネットワーク内で" class="level1">
+<h1>WSL 側の IP を固定する（同一L2ネットワーク内で）</h1>
+<p>WSL2 の標準ネットワークはNATで、毎回IPが変わります。 以下の手順で、「Hyper-V 仮想スイッチ」経由でLANに直接参加する設定をします。</p>
+<ol type="1">
+<li>Windows 側で仮想スイッチを作成</li>
+</ol>
+<p>PowerShell（管理者）で実行：</p>
+<p>物理NIC名を確認（有線なら “Ethernet”、無線なら “Wi-Fi” など）</p>
+<pre><code>Get-NetAdapter | ? Status -eq Up | ft Name, IfIndex, Status</code></pre>
+<pre><code>Get-WindowsOptionalFeature -Online -FeatureName Microsoft-Hyper-V-All
+Get-WindowsOptionalFeature -Online -FeatureName VirtualMachinePlatform</code></pre>
+<p>Hyper-V 外部スイッチを作成（WSLBridge という名前で作るのがポイント）</p>
+<p>有線にぶら下げる例:</p>
+<pre><code>New-VMSwitch -Name "WSLBridge" -NetAdapterName "イーサネット" -AllowManagementOS $true</code></pre>
+<p>%USERPROFILE%.wslconfig を作成または編集して、以下を追記：</p>
+<p>[wsl2] networkingMode=bridged vmSwitch=WSLBridge</p>
+<pre><code>
+networkingMode=bridged により、WSL VM がホストと同一L2ネットワークに直結されます。
+
+その後WSLを再起動：</code></pre>
+<p>wsl –shutdown wsl</p>
+<pre><code>
+3. WSL 側で固定IPを割り当て
+
+Ubuntu (WSL) 側で netplan または systemd-networkd を使って静的IPを設定します。
+最近のUbuntu 24.04では /etc/systemd/network/eth0.network が多いです。</code></pre>
+<p>sudo mkdir -p /etc/systemd/network sudo nano /etc/systemd/network/eth0.network</p>
+<pre><code>
+内容例：</code></pre>
+<p>[Match] Name=eth0</p>
+<p>[Network] Address=192.168.21.10/24 Gateway=192.168.21.1 DNS=192.168.21.1</p>
+<pre><code>
+適用して再起動：</code></pre>
+<p>sudo systemctl restart systemd-networkd ip addr show eth0</p>
+<pre><code>
+
+192.168.21.10 が割り当たっていればOKです。
+
+# Windows ファイアウォールとポートフォワードの設定
+bridged モードの場合
+
+WSLが直接LANに参加しているので、ポートフォワードは不要です。
+ただし、WSL内のポートをWindowsのファイアウォールがブロックすることがあります。
+
+以下でポート8000を許可：</code></pre>
+<p>netsh advfirewall firewall add rule name=“WSL Static Web” dir=in action=allow protocol=TCP localport=8000</p>
+<pre><code>
+# ゲートウェイ越えでアクセス確認
+
+LAN内の別PCまたはスマホから以下にアクセスしてみます：
+
+http://192.168.21.10:8000
+
+
+→ 「Hello from WSL2 Static Server」が表示されれば成功 ✅
+
+# 参考：NATモード + Port Forward での代替
+
+もし bridged が難しい場合、従来のNATモードでポートフォワードを使う方法もあります。
+PowerShellで以下のようにルールを追加：</code></pre>
+<p>netsh interface portproxy add v4tov4 listenaddress=0.0.0.0 listenport=8000 connectaddress=127.0.0.1 connectport=8000</p>
+<pre><code>
+さらにファイアウォール許可：</code></pre>
+<p>netsh advfirewall firewall add rule name=“WSL NAT Port 8000” dir=in action=allow protocol=TCP localport=8000 ```</p>
+<p>この場合は WindowsホストのIP にアクセスします（例：http://192.168.21.10:8000）。</p>
+</section>
+<section id="ポイントまとめ" class="level1">
+<h1>ポイントまとめ</h1>
+<p>方法 特徴 LAN越え bridged モード（推奨） 直接LANに参加、固定IP割当可能 可能（GW越え可） NAT + portproxy デフォルト、簡単 可能（Windows経由）</p>
+<p>ご希望によっては、Caddy や nginx をWSLに入れて自動起動させ、学内ネット全体に公開するようにも設定可能です。希望しますか？（例：systemd 有効化、caddy.service）</p>
 </section>
 
 </main>

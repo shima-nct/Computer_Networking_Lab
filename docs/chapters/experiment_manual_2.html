@@ -21,21 +21,56 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
 
 
-<script src="settingup_files/libs/clipboard/clipboard.min.js"></script>
-<script src="settingup_files/libs/quarto-html/quarto.js" type="module"></script>
-<script src="settingup_files/libs/quarto-html/tabsets/tabsets.js" type="module"></script>
-<script src="settingup_files/libs/quarto-html/axe/axe-check.js" type="module"></script>
-<script src="settingup_files/libs/quarto-html/popper.min.js"></script>
-<script src="settingup_files/libs/quarto-html/tippy.umd.min.js"></script>
-<script src="settingup_files/libs/quarto-html/anchor.min.js"></script>
-<link href="settingup_files/libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="settingup_files/libs/quarto-html/quarto-syntax-highlighting-7b89279ff1a6dce999919e0e67d4d9ec.css" rel="stylesheet" id="quarto-text-highlighting-styles">
-<script src="settingup_files/libs/bootstrap/bootstrap.min.js"></script>
-<link href="settingup_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="settingup_files/libs/bootstrap/bootstrap-6b644e33ed36ddf8b552b26d431ef1a9.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script src="experiment_manual_2_files/libs/clipboard/clipboard.min.js"></script>
+<script src="experiment_manual_2_files/libs/quarto-html/quarto.js" type="module"></script>
+<script src="experiment_manual_2_files/libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="experiment_manual_2_files/libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="experiment_manual_2_files/libs/quarto-html/popper.min.js"></script>
+<script src="experiment_manual_2_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="experiment_manual_2_files/libs/quarto-html/anchor.min.js"></script>
+<link href="experiment_manual_2_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="experiment_manual_2_files/libs/quarto-html/quarto-syntax-highlighting-7b89279ff1a6dce999919e0e67d4d9ec.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="experiment_manual_2_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="experiment_manual_2_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="experiment_manual_2_files/libs/bootstrap/bootstrap-6b644e33ed36ddf8b552b26d431ef1a9.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 
 
 <link rel="stylesheet" href="../styles.css">
@@ -45,7 +80,7 @@ ul.task-list li input[type="checkbox"] {
 
 <div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
 <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-<div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="settingup.pdf"><i class="bi bi-file-pdf"></i>PDF</a></li></ul></div></div>
+<div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="experiment_manual_2.pdf"><i class="bi bi-file-pdf"></i>PDF</a></li></ul></div></div>
 <main class="content" id="quarto-document-content">
 
 <header id="title-block-header">
@@ -55,21 +90,153 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
-<section id="sshによるリモート接続" class="level2">
-<h2 class="anchored" data-anchor-id="sshによるリモート接続">sshによるリモート接続</h2>
-<section id="シンプルなssh接続パスワード認証の場合" class="level3">
-<h3 class="anchored" data-anchor-id="シンプルなssh接続パスワード認証の場合">シンプルなssh接続（パスワード認証の場合）</h3>
+<section id="実験手順書第2回-naptによるインターネット接続" class="level1">
+<h1>実験手順書：第2回 NAPTによるインターネット接続</h1>
+<section id="実験の目的" class="level2">
+<h2 class="anchored" data-anchor-id="実験の目的">1. 実験の目的</h2>
+<p>前回の実験で構築した内部ネットワークを模擬的なインターネットに接続する。組織の出入り口となるゲートウェイにNAPT（Network Address Port Translation）を設定し、複数のプライベートIPアドレスを持つPCが一つのグローバルIPアドレスを共有してインターネットと通信する仕組みを学ぶ。今回の目標は以下の通りである。</p>
+<ul>
+<li>NAPT（IPマスカレード）の概念と必要性を理解する。</li>
+<li><code>iptables</code> を用いてLinuxルーターにNAPTを設定できる。</li>
+<li>内部ネットワークからインターネット上のサーバーへアクセスできることを確認する。</li>
+<li>DNSのフォワーディング機能を設定し、内部ドメインと外部ドメインの両方を名前解決できる仕組みを構築する。</li>
+<li>NAPTによるアドレス変換の様子を観察し、その動作を説明できる。</li>
+</ul>
 </section>
-<section id="公開鍵認証によるssh接続" class="level3">
-<h3 class="anchored" data-anchor-id="公開鍵認証によるssh接続">公開鍵認証によるssh接続</h3>
-<p>sshで公開鍵（ペアとなる秘密鍵も作られる）を作り、それをリモートユーザーの <code>~/.ssh/authorized_keys</code> に追加することで、公開鍵認証によるssh接続を確立することができる。公開鍵認証時に暗号化されている秘密鍵を取り出すためににパスワードが必要となるが、このパスワードをしないで秘密鍵をつくっておくと、パスワードなしのログインができるようになる。</p>
-<p>公開鍵をリモートユーザーの <code>~/.ssh/authorized_keys</code> に追加するには、<code>ssh-copy-id</code>コマンドを使用する。しかし、Windows環境では、ssh-copy-idコマンドが標準で提供されていないため、ここではPowerShellモジュールである<code>SSH-Copy-ID</code>を用いる方法を紹介する。なお、このようなスクリプトに頼らなくてもリモート先でエディアをつかって<code>~/.ssh/authorized_keys</code> を編集すれば公開鍵を登録することができる。</p>
-<p><a href="https://www.powershellgallery.com/packages/SSH-Copy-ID/1.0.1"><code>SSH-Copy-ID</code>はPowerShell Gallaryで公開されている</a>。 インストールするには、管理者権限のもと以下のコマンドを実行する。</p>
-<pre><code>Install-Module -Name SSH-Copy-ID</code></pre>
-<p>管理者権限でPowerShellを実行するには、管理者権限で実行されているWindowsターミナルから実行するか、<code>sudo</code>コマンドで実行することができる。</p>
-<p>管理者権限で実行されているWindowsターミナルの起動は、Windowsターミナルを右クリックして「管理者として実行」を選択するで実行することで行える。</p>
-<p><code>sudo</code>コマンドは以下のコマンドでインストールできる。</p>
-<pre><code>winget install sudo</code></pre>
+<section id="実験環境" class="level2">
+<h2 class="anchored" data-anchor-id="実験環境">2. 実験環境</h2>
+<ul>
+<li><strong>前提条件:</strong> 第1回の実験で構築したネットワークが、すべての設定を含めて正しく動作していること。</li>
+<li><strong>追加の構成:</strong> ゲートウェイ(GW)を教員が準備したインターネットセグメントに接続する。</li>
+</ul>
+<p><strong>IPアドレス設定表（第2回追加分）</strong></p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 16%">
+<col style="width: 16%">
+<col style="width: 16%">
+<col style="width: 16%">
+<col style="width: 16%">
+<col style="width: 16%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">機器名</th>
+<th style="text-align: left;">役割</th>
+<th style="text-align: left;">インターフェース</th>
+<th style="text-align: left;">IPアドレス/マスク</th>
+<th style="text-align: left;">ゲートウェイ</th>
+<th style="text-align: left;">DNSサーバー</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">GW</td>
+<td style="text-align: left;">ゲートウェイ</td>
+<td style="text-align: left;">WAN (eth0)</td>
+<td style="text-align: left;"><code>10.0.0.1/24</code></td>
+<td style="text-align: left;"><code>10.0.0.254</code></td>
+<td style="text-align: left;"><code>10.0.0.53</code></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">ExtDNS</td>
+<td style="text-align: left;">外部DNS</td>
+<td style="text-align: left;">-</td>
+<td style="text-align: left;"><code>10.0.0.53/24</code></td>
+<td style="text-align: left;"><code>10.0.0.254</code></td>
+<td style="text-align: left;">(自身)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">ExtWeb</td>
+<td style="text-align: left;">外部Web</td>
+<td style="text-align: left;">-</td>
+<td style="text-align: left;"><code>10.0.0.80/24</code></td>
+<td style="text-align: left;"><code>10.0.0.254</code></td>
+<td style="text-align: left;"><code>10.0.0.53</code></td>
+</tr>
+</tbody>
+</table>
+<p><em>インターネット側のルーター（<code>10.0.0.254</code>）は教員が管理する。</em></p>
+</section>
+<section id="実験手順" class="level2">
+<h2 class="anchored" data-anchor-id="実験手順">3. 実験手順</h2>
+<section id="ステップ1ゲートウェイgwのインターネット接続" class="level3">
+<h3 class="anchored" data-anchor-id="ステップ1ゲートウェイgwのインターネット接続">ステップ1：ゲートウェイ(GW)のインターネット接続</h3>
+<p>GWをインターネットに接続し、自身がインターネットと通信できるように設定する。</p>
+<ol type="1">
+<li><p><strong>WAN側インターフェースの設定</strong> GWのWAN側インターフェース（例: <code>eth0</code>）にグローバルIPアドレスを設定する。 <code>bash     # GWで実行     sudo ip addr add 10.0.0.1/24 dev eth0</code></p></li>
+<li><p><strong>デフォルトゲートウェイの設定</strong> GW自身にとってのインターネットへの出口を設定する。これによりGWは未知の宛先のパケットをすべてインターネット側ルーター(<code>10.0.0.254</code>)へ転送する。 <code>bash     # GWで実行     sudo ip route add default via 10.0.0.254</code></p></li>
+<li><p><strong>疎通確認</strong> GWからインターネット上のサーバー（ExtWeb: <code>10.0.0.80</code>）へ <code>ping</code> が通ることを確認する。 <code>bash     # GWで実行     ping 10.0.0.80</code> <em>この時点では、内部のクライアントPCから <code>ping</code> は通らない。戻りのパケットがクライアントPCのプライベートIPアドレスに届かないためである。</em></p></li>
+</ol>
+</section>
+<section id="ステップ2naptipマスカレードの設定" class="level3">
+<h3 class="anchored" data-anchor-id="ステップ2naptipマスカレードの設定">ステップ2：NAPT（IPマスカレード）の設定</h3>
+<p>内部ネットワークのPCがGWのグローバルIPアドレス（<code>10.0.0.1</code>）を借りてインターネットと通信できるように、<code>iptables</code> を使ってNAPTを設定する。</p>
+<ol type="1">
+<li><p><strong><code>iptables</code> ルールの追加</strong> 「POSTROUTING」チェーン、すなわちパケットがルーターから出ていく直前に送信元アドレスを書き換える（マスカレードする）ルールを追加する。</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># GWで実行</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="co"># -t nat: natテーブルを操作する</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co"># -A POSTROUTING: POSTROUTINGチェーンに追加する</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co"># -o eth0: 出力インターフェースがeth0（WAN側）の場合</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="co"># -j MASQUERADE: 送信元IPアドレスをeth0のIPアドレスに書き換える</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> iptables <span class="at">-t</span> nat <span class="at">-A</span> POSTROUTING <span class="at">-o</span> eth0 <span class="at">-j</span> MASQUERADE</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div></li>
+<li><p><strong>設定の確認</strong> 追加したルールを確認する。 <code>bash     # GWで実行     sudo iptables -t nat -L POSTROUTING -v</code></p></li>
+<li><p><strong>内部クライアントからの疎通確認</strong> ClientAから再度ExtWeb (<code>10.0.0.80</code>) へ <code>ping</code> を実行する。今回は成功するはずである。 <code>bash     # ClientAで実行     ping 10.0.0.80</code></p></li>
+</ol>
+</section>
+<section id="ステップ3dnsフォワーダーの設定" class="level3">
+<h3 class="anchored" data-anchor-id="ステップ3dnsフォワーダーの設定">ステップ3：DNSフォワーダーの設定</h3>
+<p>内部DNSサーバー(<code>IntDNS</code>) が、自身のゾーンに存在しないドメイン（例: <code>www.example.com</code>）に関する問い合わせを外部DNSサーバー(<code>ExtDNS</code>)へ転送するように設定する。</p>
+<ol type="1">
+<li><p><strong>BIND9のオプション設定を編集する。</strong> <code>bash     # IntDNSで実行     sudo nano /etc/bind/named.conf.options</code></p></li>
+<li><p><strong><code>forwarders</code> を追加する。</strong> <code>options</code> ブロック内に以下の2行を追加または修正する。</p>
+<pre class="text"><code>options {
+    directory "/var/cache/bind";
+
+    // ↓↓↓↓ この2行を追加 ↓↓↓↓
+    forwarders {
+        10.0.0.53; // 外部DNSサーバーのIPアドレス
+    };
+    forward only;
+    // ↑↑↑↑ ここまで ↑↑↑↑
+
+    dnssec-validation auto;
+    listen-on-v6 { any; };
+};</code></pre></li>
+<li><p><strong>BIND9を再起動する。</strong> <code>bash     # IntDNSで実行     sudo systemctl restart bind9</code></p></li>
+</ol>
+</section>
+<section id="ステップ4最終的な動作確認" class="level3">
+<h3 class="anchored" data-anchor-id="ステップ4最終的な動作確認">ステップ4：最終的な動作確認</h3>
+<p>ClientAから、すべてのネットワーク機能が統合的に動作することを確認する。</p>
+<ol type="1">
+<li><p><strong>外部ドメインの名前解決</strong> ClientAから <code>nslookup</code> で外部ドメイン（例: <code>www.example.com</code>、教員から指示されたドメイン名）が引けることを確認する。 <code>bash     # ClientAで実行     nslookup www.example.com</code> この問い合わせは <code>ClientA -&gt; R1 -&gt; GW -&gt; IntDNS -&gt; GW -&gt; ExtDNS</code> という経路を辿り、応答が返る。</p></li>
+<li><p><strong>内部ドメインの名前解決</strong> 引き続き、内部ドメイン（<code>intweb.corp.local</code>）も引けることを確認する。 <code>bash     # ClientAで実行     nslookup intweb.corp.local</code></p></li>
+<li><p><strong>Webブラウザでのアクセス</strong> ClientAにGUI環境が整っていれば、Webブラウザを起動し内部Webサーバー (<code>http://intweb.corp.local</code>) と外部Webサーバー (<code>http://www.example.com</code>) の両方にアクセスできることを確認すること。</p></li>
+</ol>
+</section>
+<section id="ステップ5naptの動作観察" class="level3">
+<h3 class="anchored" data-anchor-id="ステップ5naptの動作観察">ステップ5：NAPTの動作観察</h3>
+<p>NAPTが実際にどのように動作しているかを確認するため、GWでコネクショントラッキングテーブルを観察する。</p>
+<ol type="1">
+<li><p><strong><code>conntrack</code> ツールのインストール</strong> <code>bash     # GWで実行     sudo apt update     sudo apt install conntrack</code></p></li>
+<li><p><strong>コネクションの監視</strong> ClientAで外部のWebサイトに <code>ping</code> を実行し続けた状態で、GWで以下のコマンドを実行する。</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ClientAで実行</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ping</span> www.example.com</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="co"># GWで実行</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> conntrack <span class="at">-L</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>出力からICMP通信を探し、<code>src=192.168.1.10</code>（ClientA）のパケットが <code>[UNREPLIED]</code> または <code>[ASSURED]</code> のセクションで <code>src=10.0.0.1</code>（GWのWAN側IP）へ書き換えられている様子を確認する。これがNAPTによるアドレス変換の証拠である。</p></li>
+</ol>
+</section>
+</section>
+<section id="課題" class="level2">
+<h2 class="anchored" data-anchor-id="課題">4. 課題</h2>
+<p>この実験結果を基に、レポートの考察の章で以下の問いに答えよ。</p>
+<ul>
+<li><strong>問:</strong> NAPTの役割とは何か。内部ネットワークのPC（<code>192.168.1.10</code>）が一つのグローバルIPアドレス（<code>10.0.0.1</code>）を使ってインターネット上のサーバーと通信できる仕組みを、<code>conntrack</code> の結果などを交えて具体的に説明せよ。</li>
+<li><strong>問:</strong> DNSフォワーダーを設定する理由を説明せよ。設定しなかった場合、ClientAから <code>www.example.com</code> への名前解決はどうなるか、そのプロセスを追って考察せよ。</li>
+</ul>
 </section>
 </section>
 
