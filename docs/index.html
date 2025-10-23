@@ -6,7 +6,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="dcterms.date" content="2025-10-02">
+<meta name="dcterms.date" content="2025-10-23">
 
 <title>3B情2 ネットワーク構築</title>
 <style>
@@ -86,13 +86,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <header id="title-block-header">
 <h1 class="title display-7">3B情2 ネットワーク構築</h1>
 
-<p class="date">2025-10-02</p>
+<p class="date">2025-10-23</p>
 </header>
 
 
 <div data-when-format="html">
 <div class="lab-meta-rt">
-v0.1.1 / 2025-10-02
+v0.1.1 / 2025-10-23
 </div>
 <h1 class="lab-title">
 <p>3B情2 ネットワーク構築</p>
@@ -154,7 +154,7 @@ v0.1.1 / 2025-10-02
 <th style="text-align: left;">インターフェース</th>
 <th style="text-align: left;">IPアドレス</th>
 <th style="text-align: left;">サブネットマスク</th>
-<th style="text-align: left;">ゲートウェイ</th>
+<th style="text-align: left;">デフォルトゲートウェイ</th>
 <th style="text-align: left;">DNSサーバー</th>
 </tr>
 </thead>
@@ -172,19 +172,19 @@ v0.1.1 / 2025-10-02
 <td style="text-align: left;">ExtDNS</td>
 <td style="text-align: left;">外部DNS</td>
 <td style="text-align: left;">-</td>
-<td style="text-align: left;"><code>10.0.0.53</code></td>
+<td style="text-align: left;"><code>1.1.1.1</code></td>
 <td style="text-align: left;"><code>255.255.255.0</code></td>
-<td style="text-align: left;"><code>10.0.0.254</code></td>
+<td style="text-align: left;">(不明)</td>
 <td style="text-align: left;">(自身)</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">ExtWeb</td>
 <td style="text-align: left;">外部Web</td>
 <td style="text-align: left;">-</td>
-<td style="text-align: left;"><code>10.0.0.80</code></td>
+<td style="text-align: left;"><code>172.217.19.0</code></td>
 <td style="text-align: left;"><code>255.255.255.0</code></td>
-<td style="text-align: left;"><code>10.0.0.254</code></td>
-<td style="text-align: left;"><code>10.0.0.53</code></td>
+<td style="text-align: left;">(不明)</td>
+<td style="text-align: left;"><code>216.239.32.10</code>, <code>216.239.34.10</code>,<code>216.239.36.10</code>,<code>216.239.38.10</code></td>
 </tr>
 <tr class="even">
 <td style="text-align: left;"><strong>学生構築ネットワーク</strong></td>
@@ -201,14 +201,14 @@ v0.1.1 / 2025-10-02
 <td style="text-align: left;">WAN (eth0)</td>
 <td style="text-align: left;"><code>10.0.0.1</code></td>
 <td style="text-align: left;"><code>255.255.255.0</code></td>
-<td style="text-align: left;"><code>10.0.0.254</code></td>
-<td style="text-align: left;"><code>10.0.0.53</code></td>
+<td style="text-align: left;">(秘匿)</td>
+<td style="text-align: left;">(秘匿)</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;"></td>
 <td style="text-align: left;"></td>
 <td style="text-align: left;">LAN (eth1)</td>
-<td style="text-align: left;"><code>192.168.0.1</code></td>
+<td style="text-align: left;"><code>192.168.1.1</code></td>
 <td style="text-align: left;"><code>255.255.255.0</code></td>
 <td style="text-align: left;">-</td>
 <td style="text-align: left;">-</td>
@@ -217,34 +217,34 @@ v0.1.1 / 2025-10-02
 <td style="text-align: left;">IntDNS</td>
 <td style="text-align: left;">内部DNS</td>
 <td style="text-align: left;">eth0</td>
-<td style="text-align: left;"><code>192.168.0.53</code></td>
+<td style="text-align: left;"><code>192.168.1.1</code></td>
 <td style="text-align: left;"><code>255.255.255.0</code></td>
-<td style="text-align: left;"><code>192.168.0.1</code></td>
-<td style="text-align: left;">(自身), <code>10.0.0.53</code></td>
+<td style="text-align: left;"><code>192.168.1.1</code></td>
+<td style="text-align: left;">(自身), <code>1.1.1.1</code></td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">IntWeb</td>
 <td style="text-align: left;">内部Web</td>
 <td style="text-align: left;">eth0</td>
-<td style="text-align: left;"><code>192.168.0.80</code></td>
+<td style="text-align: left;"><code>192.168.1.10</code></td>
 <td style="text-align: left;"><code>255.255.255.0</code></td>
-<td style="text-align: left;"><code>192.168.0.1</code></td>
-<td style="text-align: left;"><code>192.168.0.53</code></td>
+<td style="text-align: left;">-</td>
+<td style="text-align: left;"><code>192.168.1.1</code></td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">R1</td>
 <td style="text-align: left;">ルーター1</td>
 <td style="text-align: left;">WAN (eth0)</td>
-<td style="text-align: left;"><code>192.168.0.11</code></td>
+<td style="text-align: left;"><code>192.168.1.21</code></td>
 <td style="text-align: left;"><code>255.255.255.0</code></td>
-<td style="text-align: left;"><code>192.168.0.1</code></td>
+<td style="text-align: left;"><code>192.168.1.1</code></td>
 <td style="text-align: left;">-</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;"></td>
 <td style="text-align: left;"></td>
 <td style="text-align: left;">LAN (eth1)</td>
-<td style="text-align: left;"><code>192.168.1.1</code></td>
+<td style="text-align: left;"><code>192.168.21.1</code></td>
 <td style="text-align: left;"><code>255.255.255.0</code></td>
 <td style="text-align: left;">-</td>
 <td style="text-align: left;">-</td>
@@ -252,38 +252,47 @@ v0.1.1 / 2025-10-02
 <tr class="odd">
 <td style="text-align: left;">R2</td>
 <td style="text-align: left;">ルーター2</td>
-<td style="text-align: left;">WAN (eth0)</td>
-<td style="text-align: left;"><code>192.168.0.12</code></td>
-<td style="text-align: left;"><code>255.255.255.0</code></td>
-<td style="text-align: left;"><code>192.168.0.1</code></td>
-<td style="text-align: left;">-</td>
+<td style="text-align: left;">WAN</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
 </tr>
 <tr class="even">
+<td style="text-align: left;">(eth0)</td>
+<td style="text-align: left;"><code>192.168.1.22</code></td>
+<td style="text-align: left;"><code>255.255.255.0</code></td>
+<td style="text-align: left;"><code>192.168.1.1</code></td>
+<td style="text-align: left;">-</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
 <td style="text-align: left;"></td>
 <td style="text-align: left;"></td>
 <td style="text-align: left;">LAN (eth1)</td>
-<td style="text-align: left;"><code>192.168.2.1</code></td>
+<td style="text-align: left;"><code>192.168.21.1</code></td>
 <td style="text-align: left;"><code>255.255.255.0</code></td>
 <td style="text-align: left;">-</td>
 <td style="text-align: left;">-</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td style="text-align: left;">ClientA</td>
 <td style="text-align: left;">クライアントA</td>
 <td style="text-align: left;">eth0</td>
-<td style="text-align: left;"><code>192.168.1.10</code></td>
+<td style="text-align: left;"><code>192.168.21.10</code></td>
 <td style="text-align: left;"><code>255.255.255.0</code></td>
-<td style="text-align: left;"><code>192.168.1.1</code></td>
-<td style="text-align: left;"><code>192.168.0.53</code></td>
+<td style="text-align: left;"><code>192.168.21.1</code></td>
+<td style="text-align: left;"><code>192.168.21.1</code></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td style="text-align: left;">ClientB</td>
 <td style="text-align: left;">クライアントB</td>
 <td style="text-align: left;">eth0</td>
-<td style="text-align: left;"><code>192.168.2.10</code></td>
+<td style="text-align: left;"><code>192.168.22.10</code></td>
 <td style="text-align: left;"><code>255.255.255.0</code></td>
-<td style="text-align: left;"><code>192.168.2.1</code></td>
-<td style="text-align: left;"><code>192.168.0.53</code></td>
+<td style="text-align: left;"><code>192.168.21.1</code></td>
+<td style="text-align: left;"><code>192.168.21.1</code></td>
 </tr>
 </tbody>
 </table>
@@ -739,8 +748,8 @@ intweb  IN      A       192.168.0.80</code></pre></li>
 <hr>
 <h3 id="考察の問い" class="anchored">考察の問い</h3>
 <ul>
-<li><p><strong>問1:</strong> ClientA (<code>192.168.1.10</code>) から ClientB (<code>192.168.2.10</code>) へ <code>ping</code> を実行した際、パケットはどのような経路を辿るか。<code>traceroute</code> の結果を示し、その各ホップ（R1, GW, R2）で、それぞれの機器のルーティングテーブルがどのように参照され、パケットが次のホップへ転送されるのかを具体的に説明せよ。</p></li>
-<li><p><strong>問2:</strong> ゲートウェイ(GW)に、内部ネットワーク（<code>192.168.1.0/24</code> および <code>192.168.2.0/24</code>）への静的ルートを設定した。もしこの設定がなかった場合、ClientA から外部Webサーバー (<code>ExtWeb</code>) への <code>ping</code> はどうなるか。「行き」と「戻り」のパケットの経路をそれぞれ考察し、通信が成立しない理由を説明せよ。</p></li>
+<li><p><strong>問1:</strong> ClientA (<code>192.168.21.10</code>) から ClientB (<code>192.168.22.10</code>) へ <code>ping</code> を実行した際、パケットはどのような経路を辿るか。<code>traceroute</code> の結果を示し、その各ホップ（R1, GW, R2）で、それぞれの機器のルーティングテーブルがどのように参照され、パケットが次のホップへ転送されるのかを具体的に説明せよ。</p></li>
+<li><p><strong>問2:</strong> ゲートウェイ(GW)に、内部ネットワーク（<code>192.168.21.0/24</code> および <code>192.168.22.0/24</code>）への静的ルートを設定した。もしこの設定がなかった場合、ClientA から外部Webサーバー (<code>ExtWeb</code>) への <code>ping</code> はどうなるか。「行き」と「戻り」のパケットの経路をそれぞれ考察し、通信が成立しない理由を説明せよ。</p></li>
 <li><p><strong>問3:</strong> NAPT（IPマスカレード）の役割とは何か。内部ネットワークにいる複数のPC（ClientA, ClientBなど）が、ゲートウェイの持つ単一のグローバルIPアドレス (<code>10.0.0.1</code>) を共有してインターネット上のサーバーと通信できる仕組みを、<code>iptables</code> の設定ルールや <code>conntrack</code> の観察結果を根拠として説明せよ。</p></li>
 <li><p><strong>問4:</strong> 内部DNSサーバー (<code>IntDNS</code>) と外部DNSサーバー (<code>ExtDNS</code>) の役割の違いは何か。ClientAが <code>intweb.corp.local</code>（内部ドメイン）と <code>www.example.com</code>（外部ドメイン）の両方の名前解決ができるのはなぜか。それぞれのドメインに対する <code>nslookup</code> の問い合わせが、どのような経路で処理されるのかをステップごとに説明せよ。</p></li>
 </ul>
