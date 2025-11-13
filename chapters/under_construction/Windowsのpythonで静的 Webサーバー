@@ -1,0 +1,23 @@
+最も簡単な方法（http.server を使う）
+
+1. 任意のフォルダに index.html を作る
+
+例：C:\Users\<あなたのユーザー名>\index.html
+
+```html
+Hello World!
+```
+
+2. Python 標準の http.server を起動
+
+PowerShell または cmd で：
+```
+cd C:\Users\<あなたのユーザー名>
+python -m http.server 8000
+```
+
+3. Web ブラウザでアクセス
+http://localhost:8000/
+
+
+→ Hello World! が表示される。
