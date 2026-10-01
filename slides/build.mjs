@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { minitype, mdString, image, p, h1, h2, physical, pt, em, fill, hexToRgb, solid, newpage, vspace } from '@minitype/minitype';
+import { minitype, mdString, image, p, h1, h2, fbr, physical, pt, em, fill, hexToRgb, solid, newpage, vspace } from '@minitype/minitype';
 
 const dir = path.dirname(fileURLToPath(import.meta.url));
 const output = path.resolve(dir, '../output/pdf/networking-lab-overview.pdf');
@@ -19,6 +19,7 @@ for (const [index, slide] of slides.entries()) {
   const blocks = mdString(slide.trim(), {
     h1: text => ({ ...h1([text]), unnumbered: true }),
     h2: text => ({ ...h2([text]), unnumbered: true }),
+    paragraph: text => p([text.map(part => part === '  \n' ? fbr() : part)]),
     image: (src) => image(path.resolve(dir, src), { width: src.endsWith('-explanation.png') ? 270 : 298, align: 'center' }),
   }).blocks;
   for (const block of blocks) {
