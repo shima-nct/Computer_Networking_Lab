@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="ja">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>3B情2 ネットワーク構築 — 概要スライド</title>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #111820; color: #fff; font: 16px system-ui, sans-serif; height: 100vh; height: 100dvh; display: grid; grid-template-rows: minmax(0, 1fr) auto; }
+  main { min-height: 0; display: grid; place-items: center; }
+  img { width: 100%; height: 100%; object-fit: contain; min-height: 0; }
+  nav { display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: 12px; padding: 10px; background: #111820; }
+  button, a { color: #fff; background: #253643; border: 1px solid #8295a3; border-radius: 6px; padding: 9px 14px; font: inherit; text-decoration: none; cursor: pointer; }
+  button:disabled { opacity: .4; cursor: default; }
+  :focus-visible { outline: 3px solid #65dae1; outline-offset: 3px; }
+  #status { min-width: 5em; text-align: center; }
+  #notice { margin: 0; }
+  :fullscreen nav { position: fixed; bottom: 0; left: 0; right: 0; opacity: 0; transition: opacity .15s; }
+  :fullscreen nav:hover, :fullscreen nav:focus-within { opacity: 1; }
+  @media (max-width: 600px) { .help { display: none; } nav { gap: 6px; } button, a { padding: 8px; } }
+</style>
+<main aria-label="概要スライド"><img id="slide" alt=""></main>
+<nav aria-label="スライド操作">
+  <button id="prev" aria-label="前のスライド">← 前へ</button>
+  <span id="status" role="status" aria-live="polite"></span>
+  <button id="next" aria-label="次のスライド">次へ →</button>
+  <button id="full">全画面</button>
+  <a href="networking-lab-overview.pdf" download>PDF保存</a>
+  <span class="help">← →：ページ送り / F：全画面 / Esc：終了</span>
+  <p id="notice" role="alert"></p>
+</nav>
+<noscript>閲覧にはJavaScriptを有効にするか、PDF保存からPDFを開いてください。</noscript>
+<script>
+const slides = /* SLIDES */;
+const image = document.getElementById('slide');
+const prev = document.getElementById('prev');
+const next = document.getElementById('next');
+const full = document.getElementById('full');
+let page = 0;
+function show(index) {
+  page = Math.max(0, Math.min(slides.length - 1, Number.isFinite(index) ? index : 0));
+  image.src = `page-${String(page + 1).padStart(2, '0')}.png`;
+  image.alt = slides[page];
+  document.getElementById('status').textContent = `${page + 1} / ${slides.length}`;
+  prev.disabled = page === 0;
+  next.disabled = page === slides.length - 1;
+  history.replaceState(null, '', `#${page + 1}`);
+}
+async function toggleFullscreen() {
+  try {
+    if (document.fullscreenElement) await document.exitFullscreen();
+    else await document.documentElement.requestFullscreen();
+    full.blur();
+    document.getElementById('notice').textContent = '';
+  } catch {
+    document.getElementById('notice').textContent = '全画面にできませんでした。PCではF11も利用できます。';
+  }
+}
+prev.addEventListener('click', () => show(page - 1));
+next.addEventListener('click', () => show(page + 1));
+full.addEventListener('click', toggleFullscreen);
+document.addEventListener('fullscreenchange', () => { full.textContent = document.fullscreenElement ? '全画面を終了' : '全画面'; });
+document.addEventListener('keydown', event => {
+  if (event.altKey || event.ctrlKey || event.metaKey) return;
+  if (event.key === ' ' && event.target.closest('button, a')) return;
+  const actions = { ArrowRight: () => show(page + 1), PageDown: () => show(page + 1), ' ': () => show(page + 1), ArrowLeft: () => show(page - 1), PageUp: () => show(page - 1), Home: () => show(0), End: () => show(slides.length - 1), f: toggleFullscreen, F: toggleFullscreen, Escape: () => { if (document.fullscreenElement) toggleFullscreen(); } };
+  if (actions[event.key]) { event.preventDefault(); actions[event.key](); }
+});
+window.addEventListener('hashchange', () => show(parseInt(location.hash.slice(1), 10) - 1));
+image.addEventListener('error', () => { document.getElementById('notice').textContent = 'スライドを読み込めません。再読み込みするかPDF保存をご利用ください。'; });
+show(parseInt(location.hash.slice(1), 10) - 1);
+</script>
+</html>

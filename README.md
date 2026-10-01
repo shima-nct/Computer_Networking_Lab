@@ -6,6 +6,8 @@
 
 Webページ形式のドキュメントは[こちら](https://shima-nct.github.io/Computer_Networking_Lab/)から閲覧できる。
 
+[概要説明スライド](https://shima-nct.github.io/Computer_Networking_Lab/slides/)は、全画面表示と左右キーでのページ送りに対応する。
+
 PDF形式のドキュメントは[こちら](./docs/index.pdf)からダウンロードできる。
 
 [docs](./docs)、[images](./images)ディレクトリには、以下の資料が含まれている。
@@ -27,4 +29,3 @@ PDF形式のドキュメントは[こちら](./docs/index.pdf)からダウンロ
 
 6.  **`network_diagram_1.mmd` / `network_diagram_2.mmd`**
     *   それぞれ第1回、第2回の実験におけるネットワーク構成図である。各手順書内で参照されている。
-

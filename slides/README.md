@@ -10,6 +10,14 @@ npm run build
 
 出力先：`../output/pdf/networking-lab-overview.pdf`
 
+## GitHub Pagesへの公開
+
+`python export-web.py` でPDFの各ページを画像化し、閲覧ページとPDFを `../docs/slides/` に出力する。PythonとPyMuPDFが必要。`viewer.html` が閲覧ページのテンプレート。PDFの再生成後に実行し、`docs/slides/` もコミット・プッシュする。Quartoを再生成する場合は、その後にこのコマンドを実行する。
+
+公開先：https://shima-nct.github.io/Computer_Networking_Lab/slides/
+
+左右キー・PageUp/PageDownで移動、Home/Endで先頭・末尾、Fまたは「全画面」ボタンで全画面表示、Escで終了する。全画面中は画面下部にポインターを移動すると操作ボタンが表示される。
+
 4枚目のネットワーク図は `network-overview.png`。編集用は `network-overview.drawio`。draw.ioで編集してPNGを再出力する。IPアドレスを省いた概念図で、端末側のスイッチと模擬インターネット側の中継機器は簡略化している。
 
 5枚目の説明図は `experiment-flow.png`。編集用は `experiment-flow.drawio`。4枚目と同じネットワーク構成をベースに、前半で構築する模擬LANを緑の囲み、後半のPCから模擬インターネットのWebサーバーへの接続を橙の矢印で示す。橙の矢印は通信の始点・終点を表し、実際の通信はR2・GWなどを経由する。
