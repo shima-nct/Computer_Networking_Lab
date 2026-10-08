@@ -4,14 +4,16 @@ project:
 
 # ここに共通メタを置く（index.qmd から {{< meta ... >}} で参照可）
 metadata:
-  title: "3B情2 ネットワーク構築"
+  title: "2026年度 E3 ネットワーク構築（電気電子工学実験Ⅲ後期）"
   author_pdf: "嶋\\enspace  直樹"
   author_html: "嶋&nbsp;直樹"
   date: today
-  version: "v0.1.1"
+  version: "v0.2.0"
 
 format:
   html:
+    lang: ja
+    format-links: false
     theme: cosmo
     css: styles.css
     title-block-style: none

@@ -1,0 +1,41 @@
+set firewall ipv4 forward filter default-action 'drop'
+set firewall ipv4 forward filter rule 10 action 'accept'
+set firewall ipv4 forward filter rule 10 description 'PAIR-TO-PAIR'
+set firewall ipv4 forward filter rule 10 inbound-interface name 'eth1'
+set firewall ipv4 forward filter rule 10 outbound-interface name 'eth1'
+set firewall ipv4 forward filter rule 20 action 'accept'
+set firewall ipv4 forward filter rule 20 description 'LAB-TO-OUTSIDE'
+set firewall ipv4 forward filter rule 20 inbound-interface name 'eth1'
+set firewall ipv4 forward filter rule 20 outbound-interface name 'eth0'
+set firewall ipv4 forward filter rule 30 action 'accept'
+set firewall ipv4 forward filter rule 30 description 'OUTSIDE-TO-LAB'
+set firewall ipv4 forward filter rule 30 inbound-interface name 'eth0'
+set firewall ipv4 forward filter rule 30 outbound-interface name 'eth1'
+set firewall ipv6 forward filter default-action 'drop'
+set interfaces ethernet eth0 address '10.0.0.1/24'
+set interfaces ethernet eth0 description 'LAB-OUTSIDE'
+set interfaces ethernet eth0 hw-id 'bc:24:11:a9:3f:0d'
+set interfaces ethernet eth1 address '192.168.1.1/24'
+set interfaces ethernet eth1 description 'LAB-COMMON'
+set interfaces ethernet eth1 hw-id 'bc:24:11:6a:42:bf'
+set interfaces ethernet eth2 address '172.20.60.13/16'
+set interfaces ethernet eth2 description 'MANAGEMENT-ONLY'
+set interfaces ethernet eth2 hw-id 'bc:24:11:52:1a:99'
+set interfaces ethernet eth2 mac 'bc:24:11:a9:3f:0d'
+set nat source rule 100 description 'LAB-TO-OUTSIDE'
+set nat source rule 100 destination address '10.0.0.0/24'
+set nat source rule 100 disable
+set nat source rule 100 outbound-interface name 'eth0'
+set nat source rule 100 source address '192.168.0.0/16'
+set nat source rule 100 translation address 'masquerade'
+set protocols static route 0.0.0.0/0 next-hop 172.20.0.1
+set protocols static route 192.168.21.0/24 next-hop 192.168.1.21
+set protocols static route 192.168.22.0/24 next-hop 192.168.1.22
+set protocols static route 192.168.23.0/24 next-hop 192.168.1.23
+set protocols static route 192.168.24.0/24 next-hop 192.168.1.24
+set protocols static route 192.168.25.0/24 next-hop 192.168.1.25
+set protocols static route 192.168.26.0/24 next-hop 192.168.1.26
+set service ssh listen-address '172.20.60.13'
+set service ssh port '22'
+set system config-management commit-confirm action 'reload'
+set system config-management commit-revisions '100'

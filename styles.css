@@ -20,4 +20,4 @@
 }
 
 /* 念のため、既定のタイトルメタが出ても非表示に */
-.quarto-title, .quarto-title-meta { display: none; }
+#title-block-header, .quarto-title, .quarto-title-meta { display: none; }

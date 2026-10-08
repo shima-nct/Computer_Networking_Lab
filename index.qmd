@@ -2,7 +2,7 @@
 <div class="lab-meta-rt">{{< meta version >}} / {{< meta date >}}</div>
 <h1 class="lab-title">{{< meta title >}}</h1>
 <div class="lab-author">{{< meta author_html >}}</div>
-<p><a href="slides/">概要説明スライド（全画面表示・ページ送り）</a></p>
+<p><a href="slides/">概要説明スライド（参考・改訂前の版）</a></p>
 :::
 
 

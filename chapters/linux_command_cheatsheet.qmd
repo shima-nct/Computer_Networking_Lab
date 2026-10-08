@@ -1,147 +1,60 @@
-# 補助資料1：Linuxネットワークコマンド チートシート
+# 補助資料：Windows・VyOSコマンド早見表
 
-この資料は、実験で使用する主要なLinuxネットワークコマンドの基本的な使い方をまとめたものである。より複雑なネットワークに対応するため、`iptables` や `bind9` 関連のコマンドを追加している。
+ペア01の例を示す。別のペアでは概要の割り当て表に読み替える。Windows端末用のコマンドとVyOS用のコマンドを混ぜない。
 
-## 1. `ip` コマンド (基本)
+## Windows端末のPowerShell
 
-ネットワークインターフェースやルーティングテーブルを管理する基本コマンドである。
+| やりたいこと | コマンド・操作 |
+| --- | --- |
+| IP・ゲートウェイ・DNS・MACを確認 | `ipconfig /all` |
+| 自分のルーターへ4回の疎通確認 | `ping -n 4 192.168.21.1` |
+| 共通Webへ疎通確認 | `ping -n 4 192.168.1.80` |
+| 他ペアまでの経路を確認 | `tracert -d 192.168.22.10` |
+| Windowsの経路表を確認 | `route print -4` |
+| 実験用DNSへ問い合わせ | `nslookup common.lab.example 192.168.21.1` |
+| 外部Webの名前解決 | `nslookup www.outside.example 192.168.21.1` |
+| ネットワークアダプター設定を開く | `Win + R` → `ncpa.cpl` |
 
-*   **インターフェースとIPアドレスの表示**
-    ```bash
-    ip address show
-    # 短縮形: ip a
-    ```
+`ping`の応答はIPで通信できた根拠であり、WebやDNSが動作する証拠とは別である。`tracert`の`*`はその途中の応答が得られなかったことを表し、直ちに通信全体の失敗を意味しない。
 
-*   **IPアドレスの追加** (例: `192.168.1.10/24` を `eth0` に)
-    ```bash
-    sudo ip addr add 192.168.1.10/24 dev eth0
-    ```
+## VyOSの運用モード
 
-*   **ルーティングテーブルの表示**
-    ```bash
-    ip route show
-    # 短縮形: ip r
-    ```
+| やりたいこと | コマンド |
+| --- | --- |
+| バージョンを確認 | `show version` |
+| NICとIPを確認 | `show interfaces` |
+| 経路表を確認 | `show ip route` |
+| 現在の設定を確認 | `show configuration commands` |
+| 共通GWへ疎通確認 | `ping 192.168.1.1 count 4` |
+| DHCPの配布を確認 | `show dhcp server leases` |
+| GWの接続追跡表を確認 | `show conntrack table ipv4` |
 
-*   **デフォルトゲートウェイの追加** (例: `192.168.1.1`)
-    ```bash
-    sudo ip route add default via 192.168.1.1
-    ```
+連続するコマンドの停止は`Ctrl + C`。表示が長い場合は必要な部分を保存し、ペア番号・日時・実行した機器名も記録する。
 
-*   **静的ルートの追加** (例: `192.168.1.0/24` へのパケットを `192.168.0.11` へ転送)
-    ```bash
-    sudo ip route add 192.168.1.0/24 via 192.168.0.11
-    ```
+## VyOSの設定モード
 
-## 2. `ping` & `traceroute` (疎通確認)
+```text
+configure
+```
 
-*   **指定ホストとの疎通確認**
-    ```bash
-    ping 192.168.1.10
-    ```
+設定例を入力した後は、次の順で確認・反映・保存する。
 
-*   **指定ホストまでの経路追跡**
-    ```bash
-    traceroute 192.168.1.10
-    ```
+```text
+compare
+commit
+save
+exit
+```
 
-## 3. `iptables` (ファイアウォール & NAPT)
+`commit`だけでは再起動後の保存にならない。設定モードで経路を確認するときは`run show ip route`と入力する。`set`で追記する前に旧設定を確認し、全設定やNAT表を一括削除しない。
 
-Linuxカーネルのパケットフィルタリング機能（Netfilter）を操作するコマンドであり、NAPTの設定に用いる。
+## 接続できないときの確認順
 
-*   **現在のNATテーブルのルールを表示**
-    ```bash
-    sudo iptables -t nat -L -v
-    ```
+1. ケーブル、リンク状態、NICの外側・内側の対応。
+2. 端末のIP・マスク・ゲートウェイ。DHCPなら配布結果。
+3. 自分のルーター、共通GW、目的のIPの順に疎通確認。
+4. 往路と復路の経路表、必要な通信のファイアウォール許可。
+5. 外部接続ならGWのNAPTと外部サーバーの状態。
+6. IP指定で成功し名前指定だけ失敗するならDNS設定と回答。
 
-*   **NAPT（IPマスカレード）ルールの追加**
-    (WAN側インターフェースが `eth0` の場合、`eth0` から出ていくパケットの送信元を `eth0` のIPアドレスに書き換える)
-    ```bash
-    sudo iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
-    ```
-
-*   **NATテーブルのルールをすべて削除**
-    ```bash
-    sudo iptables -t nat -F
-    ```
-
-## 4. `conntrack` (コネクショントラッキング)
-
-NAPTによって変換されている通信セッションの状態を確認できる。
-
-*   **`conntrack` ツールのインストール**
-    ```bash
-    sudo apt update
-    sudo apt install conntrack
-    ```
-
-*   **現在のコネクショントラックテーブルを表示**
-    ```bash
-    sudo conntrack -L
-    ```
-
-*   **特定の送信元IPアドレスでフィルタリング** (例: ClientA `192.168.1.10`)
-    ```bash
-    sudo conntrack -L -s 192.168.1.10
-    ```
-
-## 5. BIND9 (DNSサーバー)
-
-DNSサーバー `BIND9` の管理用コマンドをまとめる。
-
-*   **BIND9のインストール**
-    ```bash
-    sudo apt update
-    sudo apt install bind9
-    ```
-
-*   **設定ファイルの構文チェック**
-    ```bash
-    sudo named-checkconf
-    ```
-
-*   **ゾーンファイルの構文チェック** (例: `corp.local` ゾーン)
-    ```bash
-    sudo named-checkzone corp.local /etc/bind/db.corp.local
-    ```
-
-*   **BIND9サービスの再起動**
-    ```bash
-    sudo systemctl restart bind9
-    ```
-
-*   **BIND9サービスのステータス確認**
-    ```bash
-    sudo systemctl status bind9
-    ```
-
-## 6. `nslookup` & `dig` (DNSクライアント)
-
-DNSサーバーに問い合わせて名前解決を行うコマンドである。
-
-*   **`nslookup` でドメイン名を問い合わせる**
-    ```bash
-    nslookup intweb.corp.local
-    ```
-
-*   **`dig` で詳細な情報を問い合わせる**
-    ```bash
-    dig www.example.com
-    ```
-
-## 7. その他
-
-*   **IPフォワーディングの有効化** (ルーター機能の有効化)
-    ```bash
-    sudo sysctl -w net.ipv4.ip_forward=1
-    ```
-
-*   **DNSサーバー設定ファイルの確認・編集**
-    (クライアントPCが参照するDNSサーバーのアドレスを管理する)
-    ```bash
-    # 確認
-    cat /etc/resolv.conf
-
-    # 編集 (例: 192.168.0.53 を指定)
-    echo "nameserver 192.168.0.53" | sudo tee /etc/resolv.conf
-    ```
+基本手順ではUbuntuの`ip addr`・`iptables`・BIND9の設定コマンドをVyOSへ入力しない。旧原稿の`under_construction`内には異なる構成・版の例が残っているため、本指導書と混ぜない。

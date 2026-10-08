@@ -1,169 +1,161 @@
-# 実験手順書：第2回 NAPTによるインターネット接続
+# 実験手順書：第2回 NAPT・外部接続・DHCP
 
-## 1. 実験の目的
+## 1. 前回の設定を確認する
 
-前回の実験で構築した内部ネットワークを模擬的なインターネットに接続する。組織の出入り口となるゲートウェイにNAPT（Network Address Port Translation）を設定し、複数のプライベートIPアドレスを持つPCが一つのグローバルIPアドレスを共有してインターネットと通信する仕組みを学ぶ。今回の目標は以下の通りである。
+端末から自分のルーター、共通GW、共通Web、他ペアの端末へIP指定で通信できることを確認する。名前指定の問題は、IP指定での通信を確認してから調べる。以下はペア01の例である。
 
-*   NAPT（IPマスカレード）の概念と必要性を理解する。
-*   `iptables` を用いてLinuxルーターにNAPTを設定できる。
-*   内部ネットワークからインターネット上のサーバーへアクセスできることを確認する。
-*   DNSのフォワーディング機能を設定し、内部ドメインと外部ドメインの両方を名前解決できる仕組みを構築する。
-*   NAPTによるアドレス変換の様子を観察し、その動作を説明できる。
+**端末1・PowerShell：**
 
-## 2. 実験環境
+```powershell
+ipconfig /all
+ping -n 4 192.168.21.1
+ping -n 4 192.168.1.80
+nslookup common.lab.example 192.168.21.1
+```
 
-*   **前提条件:** 第1回の実験で構築したネットワークが、すべての設定を含めて正しく動作していること。
-*   **追加の構成:** ゲートウェイ(GW)を教員が準備したインターネットセグメントに接続する。
+## 2. NAPT前の通信を観察する
 
-**IPアドレス設定表（第2回追加分）**
+教員はGWの外側が`10.0.0.1/24`で、外部Webが`10.0.0.80/24`であることを確認する。外部Webには内部LANへの静的ルートやデフォルトルートを設定しない。
 
-| 機器名 | 役割 | インターフェース | IPアドレス/マスク | ゲートウェイ | DNSサーバー |
-| :--- | :--- | :--- | :--- | :--- | :--- |
-| GW | ゲートウェイ | WAN (eth0) | `10.0.0.1/24` | `10.0.0.254` | `10.0.0.53` |
-| ExtDNS | 外部DNS | - | `10.0.0.53/24` | `10.0.0.254` | (自身) |
-| ExtWeb | 外部Web | - | `10.0.0.80/24` | `10.0.0.254` | `10.0.0.53` |
+**GW・運用モード：**
 
-*インターネット側のルーター（`10.0.0.254`）は教員が管理する。*
+```text
+ping 10.0.0.80 count 4
+```
 
-## 3. 実験手順
+**端末1・PowerShell：**
 
-### ステップ1：ゲートウェイ(GW)のインターネット接続
+```powershell
+ping -n 4 10.0.0.80
+```
 
-GWをインターネットに接続し、自身がインターネットと通信できるように設定する。
+GW自身からは応答があり、端末からは応答がないという差を観察する。NAPT前の端末からのパケットは、送信元`192.168.21.10`のまま外部Webに届くが、外部Webには戻りの経路がない。失敗しただけでこの理由と断定せず、教員の経路確認やパケット観察と照合する。すでに成功する場合は、残存するNATや別の戻り経路を確認する。
 
-1.  **WAN側インターフェースの設定**
-    GWのWAN側インターフェース（例: `eth0`）にグローバルIPアドレスを設定する。
-    ```bash
-    # GWで実行
-    sudo ip addr add 10.0.0.1/24 dev eth0
-    ```
+## 3. GWでNAPTを設定する（教員操作・全員で確認）
 
-2.  **デフォルトゲートウェイの設定**
-    GW自身にとってのインターネットへの出口を設定する。これによりGWは未知の宛先のパケットをすべてインターネット側ルーター(`10.0.0.254`)へ転送する。
-    ```bash
-    # GWで実行
-    sudo ip route add default via 10.0.0.254
-    ```
+NAPTは送信元のIPアドレスと、必要に応じてポート番号を変換する。GWの外側IPを複数の内部端末で共有し、対応表を使って応答を元の端末へ返す。本実験ではGWだけで行い、ペアルーターにはNAT設定を入れない。
 
-3.  **疎通確認**
-    GWからインターネット上のサーバー（ExtWeb: `10.0.0.80`）へ `ping` が通ることを確認する。
-    ```bash
-    # GWで実行
-    ping 10.0.0.80
-    ```
-    *この時点では、内部のクライアントPCから `ping` は通らない。戻りのパケットがクライアントPCのプライベートIPアドレスに届かないためである。*
+GWには教員がルール100を無効状態で準備している。以下で設定内容を確認し、`disable`を削除して有効にする。
 
-### ステップ2：NAPT（IPマスカレード）の設定
+**GWで設定：**
 
-内部ネットワークのPCがGWのグローバルIPアドレス（`10.0.0.1`）を借りてインターネットと通信できるように、`iptables` を使ってNAPTを設定する。
+```text
+configure
+set nat source rule 100 description LAB-TO-OUTSIDE
+set nat source rule 100 outbound-interface name eth0
+set nat source rule 100 source address 192.168.0.0/16
+set nat source rule 100 destination address 10.0.0.0/24
+set nat source rule 100 translation address masquerade
+delete nat source rule 100 disable
+compare
+commit
+save
+exit
+```
 
-1.  **`iptables` ルールの追加**
-    「POSTROUTING」チェーン、すなわちパケットがルーターから出ていく直前に送信元アドレスを書き換える（マスカレードする）ルールを追加する。
+この`192.168.0.0/16`は共通ネットワークと全ペアLANをまとめて照合する範囲であり、端末へ設定するサブネットマスクではない。端末は引き続き`/24`を使う。実験専用GWで、外側eth0から模擬外部ネットワークへ出る通信を対象にする。`masquerade`は出力NICのIP（ここでは`10.0.0.1`）へ変換する指定である。[VyOS NAT44公式資料](https://docs.vyos.io/en/1.5/configuration/nat/nat44.html)
 
-    ```bash
-    # GWで実行
-    # -t nat: natテーブルを操作する
-    # -A POSTROUTING: POSTROUTINGチェーンに追加する
-    # -o eth0: 出力インターフェースがeth0（WAN側）の場合
-    # -j MASQUERADE: 送信元IPアドレスをeth0のIPアドレスに書き換える
-    sudo iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
-    ```
+次の班の第1回に戻すときは、教員が設定モードで`set nat source rule 100 disable`、`commit`、`save`を実行する。前の通信の接続状態を引き継がないよう、新しい接続でNAPT前後を観察する。
 
-2.  **設定の確認**
-    追加したルールを確認する。
-    ```bash
-    # GWで実行
-    sudo iptables -t nat -L POSTROUTING -v
-    ```
+**端末1・PowerShell：**
 
-3.  **内部クライアントからの疎通確認**
-    ClientAから再度ExtWeb (`10.0.0.80`) へ `ping` を実行する。今回は成功するはずである。
-    ```bash
-    # ClientAで実行
-    ping 10.0.0.80
-    ```
+```powershell
+ping -n 4 10.0.0.80
+```
 
-### ステップ3：DNSフォワーダーの設定
+ブラウザーで`http://10.0.0.80:8000/`を開く。NAPT前後の結果を記録する。応答がない場合は、GWの戻り経路と、外部Webの待受・ファイアウォールも確認する。NATの設定は、通信を許可するファイアウォール設定の代わりにはならない。
 
-内部DNSサーバー(`IntDNS`) が、自身のゾーンに存在しないドメイン（例: `www.example.com`）に関する問い合わせを外部DNSサーバー(`ExtDNS`)へ転送するように設定する。
+## 4. 外部DNSへの問い合わせを確認する
 
-1.  **BIND9のオプション設定を編集する。**
-    ```bash
-    # IntDNSで実行
-    sudo nano /etc/bind/named.conf.options
-    ```
+共通DNSは内部名を自ら回答し、`outside.example`への問い合わせを外部DNSの`10.0.0.53`へ転送する。これは教員が準備した設定を観察する実験である。
 
-2.  **`forwarders` を追加する。**
-    `options` ブロック内に以下の2行を追加または修正する。
-    ```text
-    options {
-        directory "/var/cache/bind";
+**端末1・PowerShell：**
 
-        // ↓↓↓↓ この2行を追加 ↓↓↓↓
-        forwarders {
-            10.0.0.53; // 外部DNSサーバーのIPアドレス
-        };
-        forward only;
-        // ↑↑↑↑ ここまで ↑↑↑↑
+```powershell
+nslookup common.lab.example 192.168.21.1
+nslookup www.outside.example 192.168.21.1
+```
 
-        dnssec-validation auto;
-        listen-on-v6 { any; };
-    };
-    ```
+内部名は`192.168.1.80`、外部名は`10.0.0.80`と回答されるか確認し、`http://www.outside.example:8000/`を開く。
 
-3.  **BIND9を再起動する。**
-    ```bash
-    # IntDNSで実行
-    sudo systemctl restart bind9
-    ```
+DNSの論理的な問い合わせ順序は「端末 → ペアルーターのDNS転送機能 → 共通DNS → 外部DNS」である。共通DNSから外部DNSへの通信はGWを通り、NAPTされる。キャッシュがあれば毎回すべての問い合わせが発生するとは限らない。
 
-### ステップ4：最終的な動作確認
+DNSが返すのは接続先のIPアドレスである。Webへの通信は名前解決後に別途行われ、DNSサーバーをWebの中継先として通過するわけではない。
 
-ClientAから、すべてのネットワーク機能が統合的に動作することを確認する。
+## 5. 変換の対応を観察する
 
-1.  **外部ドメインの名前解決**
-    ClientAから `nslookup` で外部ドメイン（例: `www.example.com`、教員から指示されたドメイン名）が引けることを確認する。
-    ```bash
-    # ClientAで実行
-    nslookup www.example.com
-    ```
-    この問い合わせは `ClientA -> R1 -> GW -> IntDNS -> GW -> ExtDNS` という経路を辿り、応答が返る。
+端末1・2から同じ外部Webを開く。教員はアクセス直後にGWの接続追跡表を表示し、全員で記録する。短い通信は表から消えるので、必要に応じてページを再読み込みする。
 
-2.  **内部ドメインの名前解決**
-    引き続き、内部ドメイン（`intweb.corp.local`）も引けることを確認する。
-    ```bash
-    # ClientAで実行
-    nslookup intweb.corp.local
-    ```
+**GW・運用モード：**
 
-3.  **Webブラウザでのアクセス**
-    ClientAにGUI環境が整っていれば、Webブラウザを起動し内部Webサーバー (`http://intweb.corp.local`) と外部Webサーバー (`http://www.example.com`) の両方にアクセスできることを確認すること。
+```text
+show conntrack table ipv4
+```
 
-### ステップ5：NAPTの動作観察
+`Original src`は内部端末から始まる通信の送信元、`Original dst`は外部Web、`Reply src`は外部Web、`Reply dst`は外部Webから見た応答先である。NAPTしたWeb通信では、元の送信元が端末のIP、応答先がGWの外側IPになることを読み取る。表示形式は実機の版で確認する。[VyOS接続追跡の公式資料](https://docs.vyos.io/en/1.5/configuration/service/conntrack-sync.html#operation)
 
-NAPTが実際にどのように動作しているかを確認するため、GWでコネクショントラッキングテーブルを観察する。
+| 記録項目 | 端末1の通信 | 端末2の通信 |
+| --- | --- | --- |
+| 元の送信元IP・ポート | 実測値 | 実測値 |
+| 外部WebのIP・ポート | 実測値 | 実測値 |
+| 変換後の送信元IP・ポート（Reply dst） | 実測値 | 実測値 |
 
-1.  **`conntrack` ツールのインストール**
-    ```bash
-    # GWで実行
-    sudo apt update
-    sudo apt install conntrack
-    ```
+ポート番号が必ず変わるとは限らない。異なる内部端末の通信を区別できる対応が保持されていることに注目する。ICMPのpingにはTCP/UDPのポート番号がないため、Webのポートの観察と混同しない。
 
-2.  **コネクションの監視**
-    ClientAで外部のWebサイトに `ping` を実行し続けた状態で、GWで以下のコマンドを実行する。
-    ```bash
-    # ClientAで実行
-    ping www.example.com
+## 6. DHCPで端末2を自動設定する
 
-    # GWで実行
-    sudo conntrack -L
-    ```
-    出力からICMP通信を探し、`src=192.168.1.10`（ClientA）のパケットが `[UNREPLIED]` または `[ASSURED]` のセクションで `src=10.0.0.1`（GWのWAN側IP）へ書き換えられている様子を確認する。これがNAPTによるアドレス変換の証拠である。
+DHCPは端末にIPアドレスやゲートウェイ、DNSを配布する仕組みである。配布は自分のLAN内だけで行い、固定IPの端末1と重複しない`.100`～`.199`を使う。
 
-## 4. 課題
+**R1で設定（VyOS 1.5系）：**
 
-この実験結果を基に、レポートの考察の章で以下の問いに答えよ。
+```text
+configure
+set service dhcp-server shared-network-name PAIR01 subnet 192.168.21.0/24 subnet-id 21
+set service dhcp-server shared-network-name PAIR01 subnet 192.168.21.0/24 option default-router 192.168.21.1
+set service dhcp-server shared-network-name PAIR01 subnet 192.168.21.0/24 option name-server 192.168.21.1
+set service dhcp-server shared-network-name PAIR01 subnet 192.168.21.0/24 range 0 start 192.168.21.100
+set service dhcp-server shared-network-name PAIR01 subnet 192.168.21.0/24 range 0 stop 192.168.21.199
+compare
+commit
+save
+exit
+```
 
-*   **問:** NAPTの役割とは何か。内部ネットワークのPC（`192.168.1.10`）が一つのグローバルIPアドレス（`10.0.0.1`）を使ってインターネット上のサーバーと通信できる仕組みを、`conntrack` の結果などを交えて具体的に説明せよ。
-*   **問:** DNSフォワーダーを設定する理由を説明せよ。設定しなかった場合、ClientAから `www.example.com` への名前解決はどうなるか、そのプロセスを追って考察せよ。
+ペア02以降は`PAIR01`とLAN番号・subnet-idを自分の番号に読み替える。この例は旧版の構文と混ぜず、教員が事前確認した版で実施する。[VyOS DHCP Server公式資料](https://docs.vyos.io/en/1.5/configuration/service/dhcp-server.html)
+
+端末2の実験用有線アダプターのIPv4設定を、IP・DNSとも「自動的に取得する」へ変更する。端末1は固定IPのままとする。
+
+**端末2・PowerShell：**
+
+```powershell
+ipconfig /all
+```
+
+IPが`.100`～`.199`、ゲートウェイとDNSが`192.168.21.1`であることを確認する。`169.254.*.*`ならDHCPでの取得に失敗している。配線、ルーターLAN側IP、DHCP設定を確認する。
+
+**R1・運用モード：**
+
+```text
+show dhcp server leases
+```
+
+端末2のMACアドレスと配布アドレスを照合する。端末2から共通Webと外部Webへの接続を再確認し、固定設定時との違いを記録する。
+
+## 7. 発展：ペアの端末1でWebを公開する
+
+教員がWindows用Pythonを準備している場合に実施する。以下はWindowsのPowerShellで実行し、WSLでは実行しない。専用フォルダーを作り、そのフォルダーの中身だけを公開する。
+
+```powershell
+New-Item -ItemType Directory -Force "$env:USERPROFILE\network-lab-web"
+Set-Location "$env:USERPROFILE\network-lab-web"
+Set-Content -LiteralPath index.html -Value '<h1>Pair 01</h1>' -Encoding utf8
+python -m http.server 8000 --bind 192.168.21.10
+```
+
+`Set-Location`は作業するフォルダー（カレントディレクトリ）を移動する命令である。`python -m http.server`はそのフォルダーを公開する。見出しとIPは自分のペアに合わせる。実験用の既存`index.html`があれば、上書き前に内容を確認する。
+
+教員が実験用ネットワークからのTCP/8000を許可したうえで、端末2から`http://192.168.21.10:8000/`、他ペアから`http://web.p01.lab.example:8000/`へ接続する。終了はサーバーを動かしたターミナルで`Ctrl + C`。この基本実験では静的ルーティングで到達するため、ペアルーターのNAPTやポート転送は追加しない。
+
+## 8. 終了時の確認
+
+設定と実測結果を保存する。GWの変更は教員が管理し、次期の実験前にNAPTの初期状態を戻す。端末のネットワーク設定と実験用ファイアウォール規則は、教員の指定する状態へ戻す。実インターネットへの接続、WSLのネットワーク変更、各ペアでのNAPT・ポート転送は今回の基本手順に含めない。

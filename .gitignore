@@ -4,3 +4,6 @@ memo
 
 /.quarto/
 **/*.quarto_ipynb
+
+# ローカルの運用表は公開しない
+/*.xlsx

@@ -1,219 +1,166 @@
-# 実験手順書：第1回 内部ネットワークの構築と静的ルーティング
+# 実験手順書：第1回 内部ネットワークと静的ルーティング
 
-## 1. 実験の目的
+## 1. 操作する場所を確認する
 
-この実験では、複数のルーターとサーバーを含む実践的な多層ネットワークをゼロから構築する。静的ルーティングを設定し、異なるネットワークセグメント間の通信を確立するとともに、内部DNSサーバーによる名前解決の仕組みを学ぶ。今回の目標は以下の通りである。
+Windowsの画面操作のようにボタンで操作する方法をGUI、文字で命令を入力する方法をCLIという。ターミナルは文字を入力・表示する画面、シェルは命令を解釈するプログラムである。
 
-*   複数のネットワークセグメントにまたがるIPアドレッシングを計画し、設定できる。
-*   Linux PCをルーターとして機能させ、IPフォワーディングと静的ルートを設定できる。
-*   `ping` および `traceroute` を用いて、複雑なネットワークにおける通信経路を特定し、問題を診断できる。
-*   DNSサーバーを構築し、内部ドメインの名前解決を実現できる。
+「Windows端末で実行」は手元のWindowsターミナルのPowerShellを指す。「VyOSで実行」はルーター本体のコンソールを指す。SSHでルーターへ接続している場合も、接続後のコマンドはルーター側で動く。手元をローカル、接続先をリモートと呼ぶ。
 
-## 2. 実験環境
+VyOSには確認用の運用モードと変更用の設定モードがある。
 
-### 2.1. 必要な機材
+| 入力 | 意味 |
+| --- | --- |
+| `show interfaces` | 運用モードでNICとIPを確認 |
+| `configure` | 設定モードに入る |
+| `set ...` | 設定候補を追加・変更 |
+| `compare` | 適用前の差分を確認 |
+| `commit` | 設定を動作へ反映 |
+| `save` | 再起動後も残すため保存 |
+| `exit` | 設定モードを終了 |
 
-*   UbuntuがインストールされたPC: 6台 (GW, R1, R2, IntDNS, IntWeb, ClientA)
-    *   *注: ClientB役のPCも必要であるが、1台のPCで役割を交代しながら実験することも可能である。GW, R1, R2役のPCはNICが2枚必要である。*
-*   スイッチングハブ: 3台
-*   LANケーブル: 適量
+設定モードで運用モードの確認コマンドを使う場合は、先頭に`run`を付ける。エラーが出たら次へ進まず、メッセージと実行場所を確認する。
 
-### 2.2. ネットワーク構成とIPアドレッシング
+以下はペア01（R1）の例である。ペア02～06は概要の表に従い、外側の末尾21とLAN番号21を、それぞれ22～26へ置き換える。共通GWの`192.168.1.1`と共通DNSの`192.168.1.53`は全ペア共通で変更しない。
 
-今回は、以下のFigure.1に示すネットワークを構築する。IPアドレスの設定ミスは通信失敗の主な原因となるため、各機器の役割とアドレスを常に確認すること。
+## 2. 配線とルーターの設定
 
+IPを変更するとSSH接続が切れる場合があるため、初期設定はルーター本体のコンソールで行う。共通スイッチからR1の外側、R1の内側からペア専用スイッチ、専用スイッチから端末2台へ配線する。NIC名・リンク状態を確認し、機器番号と接続口を実験ノートに記録する。
 
+**R1・運用モードで確認：**
 
-**IPアドレス設定表**
-
-| 機器名 | 役割 | インターフェース | IPアドレス/マスク | ゲートウェイ |
-| :--- | :--- | :--- | :--- | :--- |
-| GW | ゲートウェイ | LAN (eth1) | `192.168.0.1/24` | - |
-| IntDNS | 内部DNS | eth0 | `192.168.0.53/24` | `192.168.0.1` |
-| IntWeb | 内部Web | eth0 | `192.168.0.80/24` | `192.168.0.1` |
-| R1 | ルーター1 | WAN (eth0) | `192.168.0.11/24` | `192.168.0.1` |
-| | | LAN (eth1) | `192.168.1.1/24` | - |
-| R2 | ルーター2 | WAN (eth0) | `192.168.0.12/24` | `192.168.0.1` |
-| | | LAN (eth1) | `192.168.2.1/24` | - |
-| ClientA | クライアントA | eth0 | `192.168.1.10/24` | `192.168.1.1` |
-| ClientB | クライアントB | eth0 | `192.168.2.10/24` | `192.168.2.1` |
-
-## 3. 実験手順
-
-### ステップ1：物理接続とIPアドレス設定
-
-構成図に従って各機器をLANケーブルで接続した後、すべてのPCに上記の表通りIPアドレスを設定する。ここではインターフェース名を `eth0`, `eth1` としているが、`ip a` で確認した実際の名前に置き換えること。
-
-**1. ルーター/ゲートウェイ (GW, R1, R2)**
-
-```bash
-# GWでの設定例
-sudo ip addr add 192.168.0.1/24 dev eth1
-sudo sysctl -w net.ipv4.ip_forward=1
-
-# R1での設定例
-sudo ip addr add 192.168.0.11/24 dev eth0
-sudo ip addr add 192.168.1.1/24 dev eth1
-sudo sysctl -w net.ipv4.ip_forward=1
-
-# R2での設定例
-sudo ip addr add 192.168.0.12/24 dev eth0
-sudo ip addr add 192.168.2.1/24 dev eth1
-sudo sysctl -w net.ipv4.ip_forward=1
+```text
+show version
+show interfaces
+show configuration commands
 ```
 
-**2. サーバー (IntDNS, IntWeb)**
+旧設定が残っている場合は教員に確認する。以下は教員が整理した初期設定に追加する例である。[VyOS Ethernet公式資料](https://docs.vyos.io/en/1.5/configuration/interfaces/ethernet.html)
 
-```bash
-# IntDNSでの設定例
-sudo ip addr add 192.168.0.53/24 dev eth0
+**R1で設定：**
+
+```text
+configure
+set system host-name R1
+set interfaces ethernet eth0 description COMMON
+set interfaces ethernet eth0 address 192.168.1.21/24
+set interfaces ethernet eth1 description PAIR01
+set interfaces ethernet eth1 address 192.168.21.1/24
+set protocols static route 0.0.0.0/0 next-hop 192.168.1.1
+set system name-server 192.168.1.53
+compare
+commit
+save
+exit
 ```
 
-**3. クライアント (ClientA, ClientB)**
+`0.0.0.0/0`は、より具体的な経路がない宛先を表す。`next-hop`は次にパケットを渡す相手である。VyOSはルーターとして使うため、Ubuntu用の`sysctl`や`iptables`をここで実行しない。
 
-```bash
-# ClientAでの設定例
-sudo ip addr add 192.168.1.10/24 dev eth0
+## 3. Windows端末に固定IPを設定する
+
+端末1は`192.168.21.10`、端末2は`192.168.21.11`とする。Windowsで`Win + R`を押し、`ncpa.cpl`を入力する。実験用の有線アダプターのプロパティから「インターネット プロトコル バージョン4（TCP/IPv4）」を開き、次を設定する。変更前の設定も記録しておく。
+
+| 項目 | 端末1 | 端末2 |
+| --- | --- | --- |
+| IPアドレス | `192.168.21.10` | `192.168.21.11` |
+| サブネットマスク | `255.255.255.0` | `255.255.255.0` |
+| デフォルトゲートウェイ | `192.168.21.1` | `192.168.21.1` |
+| 優先DNSサーバー | `192.168.21.1` | `192.168.21.1` |
+
+代替DNSは設定せず、実験用DNSを通るようにする。WSL内部のアダプターではなく、ケーブルをつないだWindows側アダプターを設定する。
+
+**端末1・PowerShellで確認：**
+
+```powershell
+ipconfig /all
+ping -n 4 192.168.21.11
+ping -n 4 192.168.21.1
 ```
 
-### ステップ2：静的ルーティング設定
+`ping`は相手からの応答を確かめる命令、`-n 4`は4回試すというオプションである。同じLANの端末と、自分のルーターに応答があるか記録する。端末宛てだけ失敗する場合は、相手のファイアウォールで実験用ICMPが許可されているか教員と確認する。
 
-各機器が「自分宛てでないパケットをどこへ送るべきか」を把握するために、ルーティング情報を設定する。
+## 4. 共通GWの経路設定（教員操作・全員で確認）
 
-**1. クライアントとサーバーのデフォルトゲートウェイ設定**
+GWの内側は`192.168.1.1/24`、外側は`10.0.0.1/24`とする。GWには、各ペアLANへ戻る経路が必要である。[VyOS Static公式資料](https://docs.vyos.io/en/1.5/configuration/protocols/static.html)
 
-各機器は、自分の所属するLANの出口となるルーターのIPアドレスをデフォルトゲートウェイとして設定する。
+**GWで設定：**
 
-```bash
-# ClientAでの設定例
-sudo ip route add default via 192.168.1.1
-
-# ClientBでの設定例
-sudo ip route add default via 192.168.2.1
-
-# IntDNS, IntWebでの設定例
-sudo ip route add default via 192.168.0.1
+```text
+configure
+set interfaces ethernet eth0 address 10.0.0.1/24
+set interfaces ethernet eth1 address 192.168.1.1/24
+set protocols static route 192.168.21.0/24 next-hop 192.168.1.21
+set protocols static route 192.168.22.0/24 next-hop 192.168.1.22
+set protocols static route 192.168.23.0/24 next-hop 192.168.1.23
+set protocols static route 192.168.24.0/24 next-hop 192.168.1.24
+set protocols static route 192.168.25.0/24 next-hop 192.168.1.25
+compare
+commit
+save
+exit
+show ip route
 ```
 
-**2. ルーターのルーティング設定**
+R6を使う場合だけ、設定モードで`set protocols static route 192.168.26.0/24 next-hop 192.168.1.26`も追加する。閉じた模擬環境なので、GWに実在未確認の上流ルーターへのデフォルトルートは設定しない。この段階ではどのルーターでもNAPTを行わない。
 
-ルーターは、より複雑な経路情報を持つ。
+## 5. 疎通と経路を調べる
 
-```bash
-# R1, R2のデフォルトゲートウェイ設定
-# R1, R2ともに、未知の宛先はすべてGW(192.168.0.1)に送る
-sudo ip route add default via 192.168.0.1
+**R1・運用モード：**
 
-# GWの静的ルート設定
-# GWは、192.168.1.0/24宛のパケットはR1(192.168.0.11)へ、
-# 192.168.2.0/24宛はR2(192.168.0.12)へ送るように設定する
-sudo ip route add 192.168.1.0/24 via 192.168.0.11
-sudo ip route add 192.168.2.0/24 via 192.168.0.12
+```text
+show ip route
+ping 192.168.1.1 count 4
 ```
 
-### ステップ3：内部ネットワーク全体の疎通確認
+**ペア01の端末1・PowerShell：**
 
-`ping` と `traceroute` を使い、設定が正しいか確認する。
+```powershell
+ping -n 4 192.168.1.1
+ping -n 4 192.168.1.80
+ping -n 4 192.168.22.10
+tracert -d 192.168.22.10
+tracert -d 192.168.1.80
+```
 
-1.  **ClientAから様々な宛先へ `traceroute` を実行せよ。**
+ペア02以外を相手にする場合は、そのペアの端末IPへ置き換える。相手ペアにも逆方向の確認を依頼し、両方の結果を保存する。`tracert -d`は途中のルーターをIPで表示する。途中に`*`が出ても、通信全体の失敗とは限らない。[Microsoft tracert](https://learn.microsoft.com/windows-server/administration/windows-commands/tracert)
 
-    ```bash
-    # ClientAから同じセグメントのルーター(R1)へ
-    traceroute 192.168.1.1
+| 通信 | 基本設定での往路 | 復路 |
+| --- | --- | --- |
+| ペア01 → ペア02 | 端末 → R1 → GW → R2 → 端末 | 逆順 |
+| ペア01 → 共通Web | 端末 → R1 → 共通Web | 共通Web → GW → R1 → 端末 |
 
-    # ClientAからGWへ
-    traceroute 192.168.0.1
-    # 経由地にR1(192.168.1.1)が表示されるはず
+R1と共通Webは同じ共通ネットワークに直接接続されているため、共通Webへの往路はGWを通らない。ICMPリダイレクトなどによって観測経路が変わる場合もある。予想をそのまま結果とせず、実際の経路表・観察結果から説明する。
 
-    # ClientAから内部Webサーバーへ
-    traceroute 192.168.0.80
-    # 経由地にR1(192.168.1.1)とGW(192.168.0.1)が表示されるはず
+## 6. ペアルーターのDNS転送を設定する
 
-    # ClientAからClientBへ ★最重要
-    traceroute 192.168.2.10
-    # 経由地にR1→GW→R2が表示されることを確認
-    ```
+DNSは名前に対応するIPアドレスを調べる仕組みである。各端末は自分のルーターへ問い合わせ、ルーターは共通DNSへ転送する。共通DNSの内部名レコードは教員が準備する。
 
-2.  **`ping` で通信できることを確認する。** 上記 `traceroute` で確認したすべての宛先に `ping` が通るはずである。もし失敗する場合、`traceroute` の結果を手掛かりに、どの区間で問題が起きているか（IPアドレス設定ミス、ルート設定漏れなど）を切り分けること。
+**R1で設定：**
 
-### ステップ4：内部DNSサーバーの構築
+```text
+configure
+set service dns forwarding listen-address 192.168.21.1
+set service dns forwarding allow-from 192.168.21.0/24
+set service dns forwarding name-server 192.168.1.53
+set service dns forwarding dnssec off
+compare
+commit
+save
+exit
+```
 
-IPアドレスではなく、分かりやすい名前でサーバーにアクセスできるようにする。
+ここでは未署名の模擬ゾーンを扱う閉じた実験用にDNSSEC検証を無効にする。実運用のDNS設定とは区別する。問い合わせの受付は自分のLANに限定し、ペアルーター同士を相互の転送先にしない。[VyOS DNS Forwarding公式資料](https://docs.vyos.io/en/1.5/configuration/service/dns.html)
 
-1.  **IntDNSサーバーにBIND9をインストールする。**
-    ```bash
-    # IntDNSで実行
-    sudo apt update
-    sudo apt install bind9
-    ```
+**端末1・PowerShell：**
 
-2.  **ゾーンファイルの設定を行う。**
-    `corp.local` という内部ドメインを管理する設定を追加する。
+```powershell
+nslookup common.lab.example 192.168.21.1
+nslookup web.p01.lab.example 192.168.21.1
+```
 
-    ```bash
-    # /etc/bind/named.conf.local に以下を追記
-    sudo nano /etc/bind/named.conf.local
-    ```
-    ```text
-    zone "corp.local" {
-        type master;
-        file "/etc/bind/db.corp.local";
-    };
-    ```
+それぞれ`192.168.1.80`と`192.168.21.10`が応答されるか確認する。DNSサーバー自身の逆引き名が「Unknown」でも、目的の名前への回答が正しいかで判断する。
 
-3.  **ゾーンファイルを作成する。**
-    IPアドレスとドメイン名の対応を定義する。
+ブラウザーで`http://common.lab.example:8000/`を開く。名前解決とWeb接続は別の処理なので、DNSが成功してもWebが表示されない場合は待受ポートやファイアウォールを確認する。
 
-    ```bash
-    # /etc/bind/db.corp.local を新規作成
-    sudo nano /etc/bind/db.corp.local
-    ```
-    ```text
-        604800
-    @       IN      SOA     intdns.corp.local. root.corp.local. (
-                                  2         ; Serial
-                             604800         ; Refresh
-                              86400         ; Retry
-                            2419200         ; Expire
-                             604800 )       ; Negative Cache TTL
-    ;
-    @       IN      NS      intdns.corp.local.
-    intdns  IN      A       192.168.0.53
-    intweb  IN      A       192.168.0.80
-    ```
+## 7. 記録と次回への保存
 
-4.  **設定を反映させ、動作を確認する。**
-    ```bash
-    # 設定ファイルの文法チェック
-    sudo named-checkconf
-    # ゾーンファイルの文法チェック
-    sudo named-checkzone corp.local /etc/bind/db.corp.local
-    # BIND9を再起動
-    sudo systemctl restart bind9
-    ```
-
-### ステップ5：DNSによる名前解決の確認
-
-1.  **クライアントのDNS設定を変更する。**
-    ClientAが、構築したIntDNSサーバーに名前解決を問い合わせるように設定する。
-    ```bash
-    # ClientAで実行
-    # /etc/resolv.conf の nameserver をIntDNSのアドレスに書き換える
-    echo "nameserver 192.168.0.53" | sudo tee /etc/resolv.conf
-    ```
-
-2.  **名前解決をテストする。**
-    `nslookup` コマンドで、`intweb.corp.local` のIPアドレスが正しく引けるか確認する。
-    ```bash
-    # ClientAで実行
-    nslookup intweb.corp.local
-    ```
-    `Server: 192.168.0.53` と `Address: 192.168.0.80` が表示されれば成功である。
-
-3.  **名前での `ping` を試す。**
-    最後に、IPアドレスの代わりに名前で `ping` が通ることを確認する。
-    ```bash
-    ping intweb.corp.local
-    ```
-
-これで第1回の実験は終了である。ここまでの設定と確認結果をレポートにまとめよ。
+ペア番号、氏名、シール番号、NICの対応、端末IP、経路表、pingの応答数、経路追跡、DNSの回答を記録する。失敗時は、どこまで成功し、何を変更して改善したかを書く。最後にルーターで`save`を実行したことを確認する。共用GWの変更は教員が行い、各ペアが同時に編集しない。
