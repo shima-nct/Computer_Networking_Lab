@@ -18,6 +18,8 @@ NIC対応、検証結果、第2回への切り替えは[GW設定記録](configs/
 
 準備作業：[RufusでVyOSの起動用USBメモリを作成する](chapters/vyos_usb_boot.qmd)（[閲覧・印刷用HTML](docs/chapters/vyos_usb_boot.html)）。USBへの書き込み、ライブ起動、ログイン、起動確認を扱う。
 
+リモート操作：[VS Codeの準備とVyOSへのSSHログイン](chapters/vscode_vyos_ssh.qmd)（[閲覧・印刷用HTML](docs/chapters/vscode_vyos_ssh.html)）。VS Codeのインストール、SSHログイン、公開鍵認証とssh-agent、パスワード認証を無効にする場合の確認・復旧手順を扱う。
+
 Webページ形式のドキュメントは[こちら](https://shima-nct.github.io/Computer_Networking_Lab/)から閲覧できる。
 
 [概要説明スライド](https://shima-nct.github.io/Computer_Networking_Lab/slides/)は、全画面表示と左右キーでのページ送りに対応する。

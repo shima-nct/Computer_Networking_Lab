@@ -1,0 +1,370 @@
+---
+title: "VS Codeの準備とVyOSへのSSHログイン"
+date: "2026-10-08"
+format:
+  html:
+    toc: true
+    toc-title: "手順の目次"
+    embed-resources: true
+---
+
+# VS Codeの準備とVyOSへのSSHログイン
+
+2026年度 E3 ネットワーク構築・準備手順書（2026年10月8日作成）
+
+## この手順でできるようになること
+
+1. WindowsにVisual Studio Code（VS Code）をインストールする。
+2. VS Codeのターミナルから、自分のペアのVyOSへSSHでログインする。
+3. 公開鍵認証を設定し、VyOSのパスワードを入力せずにログインする。
+
+SSHは、ネットワーク経由で別の機器へログインし、暗号化した通信で操作するための仕組みである。サーバーやルーターを、その機器の前まで行かずに管理するときに使う。
+
+本書ではWindows版VS Codeの**内蔵ターミナルで`ssh`コマンドを使う**。この方法ではRemote - SSH拡張機能や、VyOS側へのVS Code Serverの導入は不要である。Remote - SSHは接続先のファイルを編集するための別の仕組みで、接続先にも動作条件がある。[VS Code公式：ターミナル](https://code.visualstudio.com/docs/terminal/basics)、[Remote - SSH](https://code.visualstudio.com/docs/remote/ssh)
+
+## 0. 操作するPCと接続先を確認する
+
+### 用語と入力場所
+
+| 用語・表示 | 意味 |
+| --- | --- |
+| ローカル | 手元で操作するWindows PC |
+| リモート | ネットワーク経由で操作するVyOSのPC |
+| コンソール | VyOS本体に直接つないだ画面とキーボード。最初の設定や復旧に使う |
+| ターミナル | 文字で命令を入力し、結果を表示する画面 |
+| シェル | ターミナルで入力した命令を解釈するプログラム。Windows側ではPowerShellを使う |
+| コマンド | コンピューターに実行させる命令。入力後に`Enter`キーを押す |
+| `PS C:\Users\…>` | WindowsのPowerShellが入力を待っている表示 |
+| `vyos@R1:~$` | VyOSの運用モードが入力を待っている表示。ホスト名は機器によって異なる |
+| `vyos@R1#`と`[edit]` | VyOSの設定モードの表示 |
+
+入力待ち表示を**プロンプト**という。コマンド例にプロンプトを含めて入力しない。SSHログイン後は同じ画面でも実行先がVyOSに変わるので、入力する前にプロンプトを見る。
+
+### この手順の接続先
+
+例はペア01のR1とする。ペア02〜06は、コマンド中の`192.168.21.1`を次の表の自分の接続先へ読み替える。ユーザー名は教員が用意した`vyos`を使う。
+
+| ペア | ルーター | SSH接続先（内側LAN） | Windows端末1／端末2のIP例 |
+| --- | --- | --- | --- |
+| 01 | R1 | `192.168.21.1` | `192.168.21.10`／`192.168.21.11` |
+| 02 | R2 | `192.168.22.1` | `192.168.22.10`／`192.168.22.11` |
+| 03 | R3 | `192.168.23.1` | `192.168.23.10`／`192.168.23.11` |
+| 04 | R4 | `192.168.24.1` | `192.168.24.10`／`192.168.24.11` |
+| 05 | R5 | `192.168.25.1` | `192.168.25.10`／`192.168.25.11` |
+| 06（追加用） | R6 | `192.168.26.1` | `192.168.26.10`／`192.168.26.11` |
+
+Windows端末とルーターの内側LANをペア専用スイッチへ接続し、サブネットマスクは`255.255.255.0`とする。配線とIP設定は「実験手順書：第1回」の手順2〜3を済ませておく。Windows PCはVyOSを起動したPCとは別に必要である。共通GWの管理用IPへは接続しない。
+
+::: {.callout-important}
+## ライブ起動と設定の保存
+
+Rufusで作ったUSBからライブ起動している場合、この手順のSSH設定や公開鍵登録は、通常、再起動すると失われる。`save`だけでは永続化できない。次回の授業にも設定を残す場合は、教員が用意した永続インストール済みのVyOSを使う。
+:::
+
+## 1. VS Codeをインストールする【Windows PC】
+
+### 1.1 インストーラーを実行する
+
+1. スタートメニューで`Visual Studio Code`を検索する。すでに起動できれば、インストールは省略して手順1.2へ進む。
+2. [VS Code公式ダウンロードページ](https://code.visualstudio.com/download)を開く。Windowsの**User Installer**を選ぶ。通常のIntel／AMD製64ビットPCでは`x64`、ARM搭載PCでは`Arm64`を選ぶ。授業で配布されたインストーラーがあれば、それを使う。
+3. 保存した`VSCodeUserSetup-…exe`をダブルクリックする。使用許諾を確認し、同意したら進む。
+4. インストール先は通常、表示された初期値のままでよい。「追加タスク」では「PATHへの追加」を有効にする。「エクスプローラーのコンテキストメニューに追加」などは任意である。
+5. 「インストール」を押し、完了したらVS Codeを起動する。
+
+User Installerは、そのWindowsユーザー向けのインストール方法で、通常は管理者権限を必要としない。学校の管理ポリシーで制限されている場合は教員へ依頼する。全ユーザー共通の導入は教員がSystem Installerで行う。[VS Code公式：Windowsへのインストール](https://code.visualstudio.com/docs/setup/windows)
+
+### 1.2 メニューを日本語にする
+
+1. VS Codeで`Ctrl + Shift + P`を押し、コマンドパレットを開く。
+2. `Configure Display Language`と入力し、該当項目を選ぶ。
+3. `日本語 (ja)`を選び、言語パックの導入と再起動の案内に従う。日本語が一覧にない場合は「Install Additional Languages」から、Microsoft提供の`Japanese Language Pack for Visual Studio Code`を導入する。
+4. 再起動後、「ファイル」「表示」「ターミナル」などが日本語になっていることを確認する。英語表示のままでも作業はできる。
+
+公式手順：[VS Codeの表示言語](https://code.visualstudio.com/docs/configure/locales)
+
+### 1.3 PowerShellのターミナルを開く
+
+1. メニューの「ターミナル」→「新しいターミナル」（英語では`Terminal`→`New Terminal`）を選ぶ。
+2. 画面下部に`PS C:\…>`が出ることを確認する。別のシェルが出た場合は、ターミナル右上の`＋`横のメニューから`PowerShell`を選ぶ。
+3. 次を入力し、WindowsのOpenSSHクライアントが使えるか確認する。
+
+```powershell
+ssh -V
+```
+
+`OpenSSH_for_Windows_…`などの版が表示されればよい。`-V`は版を表示するオプションで、大文字の`V`を使う。「認識されません」と出る場合は、教員が**管理者のPowerShell**で次を実行する。
+
+```powershell
+Add-WindowsCapability -Online -Name OpenSSH.Client~~~~0.0.1.0
+```
+
+導入後はVS Codeを開き直し、もう一度`ssh -V`で確認する。Windowsに必要なのはSSHの**クライアント**である。[Microsoft公式：OpenSSHの導入](https://learn.microsoft.com/en-us/windows-server/administration/openssh/openssh_install_firstuse)
+
+## 2. VyOSへログインする
+
+### 2.1 SSHを有効にする【VyOS本体のコンソール】
+
+1. ルーター本体の画面で`vyos`としてログインする。パスワードは教員指定のものを使う。公式ライブイメージの初期値は`vyos`だが、設定済みの機器では変更されている場合がある。
+2. 運用モードで次を実行し、自分のルーターであることと内側LANのIPを確認する。
+
+```text
+show version
+show interfaces
+```
+
+3. R1なら内側LANに`192.168.21.1/24`があることを確認する。異なる場合は、第1回のIP設定を教員と確認してから進む。
+4. 次を1行ずつ実行する。`listen-address`は、SSHの接続を受け付ける自分のルーターのIPである。
+
+```text
+configure
+set service ssh port 22
+set service ssh listen-address 192.168.21.1
+compare
+commit
+save
+exit
+```
+
+`configure`で設定モードへ入り、`set`で設定を追加する。`compare`で変更内容を確認し、`commit`で適用、`save`で保存する。`exit`で運用モードへ戻る。エラーが出たら次へ進まず内容を確認する。すでにSSH設定がある機器では、既存の待受IPや認証方式を教員と確認する。
+
+5. 続いて、接続先の本人確認に使う指紋（フィンガープリント）を表示して記録する。
+
+```text
+show ssh fingerprints
+```
+
+SSH設定とフィンガープリントの公式資料：[VyOS 1.5：SSH](https://docs.vyos.io/en/1.5/configuration/service/ssh.html)
+
+### 2.2 接続を確認する【Windows・VS CodeのPowerShell】
+
+```powershell
+ipconfig
+Test-NetConnection 192.168.21.1 -Port 22
+```
+
+`ipconfig`で実験用LANのIPを確認する。`Test-NetConnection`の`TcpTestSucceeded : True`は、接続先のSSH用ポート22へ到達できることを示す。`False`の場合は、配線、IP、VyOSのSSH設定を確認する。ファイアウォールが設定されている場合は、教員が実験用LANからのSSHを許可する。
+
+### 2.3 SSHでログインする【Windows・VS CodeのPowerShell】
+
+```powershell
+ssh vyos@192.168.21.1
+```
+
+`vyos`は接続先のユーザー名、`@`の後ろは接続先IPである。
+
+1. 初回は`Are you sure you want to continue connecting ...?`などと表示される。表示された鍵の種類と`SHA256:…`を、**手順2.1でルーター本体に表示した同じ種類のフィンガープリント**と照合する。
+2. 一致したら半角で`yes`と入力する。一致しなければ接続を中止し、機器とIPを確認する。
+3. `vyos@192.168.21.1's password:`などが出たら、教員指定のVyOSのパスワードを入力する。入力した文字も`●`も表示されないが、そのまま入力して`Enter`を押す。
+4. `vyos@R1:~$`などのプロンプトが出れば成功である。
+
+**ここから入力先はVyOSになる。** 次の2行を実行し、版と接続口を確認する。
+
+```text
+show version
+show interfaces
+```
+
+運用モードで`exit`と入力するとSSH接続が終了し、Windowsの`PS C:\…>`に戻る。設定モードにいる場合、最初の`exit`は運用モードへ戻る操作になる。
+
+## 3. 公開鍵認証でパスワード入力を省く
+
+### 3.1 2種類の鍵とパスフレーズ
+
+公開鍵認証では、対応する2つの鍵で本人を確認する。**VyOSのアカウントのパスワードを空にする操作ではない。**
+
+| 項目 | 置く場所・用途 |
+| --- | --- |
+| 秘密鍵 | Windowsの自分のユーザーフォルダーに置く。他人へ渡したり、提出物・共有フォルダー・Gitへ入れたりしない |
+| 公開鍵（末尾`.pub`） | 対応する秘密鍵を持つ人のログインを許可するため、VyOSへ登録する |
+| VyOSのパスワード | VyOS側のアカウントの認証に使う。公開鍵認証が成功すればSSH接続時の入力は不要 |
+| 鍵のパスフレーズ | Windows上の秘密鍵を保護するための文字列。VyOSのパスワードとは別のもの |
+| ssh-agent | 登録した鍵で認証を行うWindowsのサービス。接続のたびにパスフレーズを入力する手間を省く |
+
+共有のWindowsアカウントでは、ほかの利用者もそのアカウントの鍵を使える。個人ごとにWindowsアカウントを使うか、教員が管理する実験専用の鍵として扱う。私用の鍵は共用アカウントへ持ち込まない。
+
+### 3.2 Windowsで実験用の鍵を作る【Windows・PowerShell】
+
+VS Codeの`＋`から**新しいPowerShellターミナル**を開く。すでにVyOSへログインしているターミナルは閉じずに残し、新しい方に`PS C:\…>`が出ていることを確認する。
+
+```powershell
+New-Item -ItemType Directory -Force -Path "$env:USERPROFILE\.ssh"
+ssh-keygen -t ed25519 -f "$env:USERPROFILE\.ssh\id_ed25519_vyos_lab" -C "vyos-lab-pc01"
+```
+
+`$env:USERPROFILE`は、今のWindowsユーザーのフォルダー（例：`C:\Users\student`）を表す。この手順は保存先を指定しているので、PowerShellで現在開いているフォルダーに依存しない。`-t`は鍵の種類、`-f`は保存先、`-C`は識別用コメントを指定する。
+
+1. 同名の鍵があり、`Overwrite (y/n)?`と出たら**`n`で中止**する。前回の実験用の鍵ならその鍵を使う。用途が不明なら教員に確認し、別名で作る場合は以降のファイル名もそろえる。
+2. `Enter passphrase ...:`に、自分で決めた鍵のパスフレーズを入力する。確認欄にも同じものを入力する。入力文字は表示されない。
+3. 次の2ファイルが作成されたことを確認する。
+
+```powershell
+Get-ChildItem "$env:USERPROFILE\.ssh\id_ed25519_vyos_lab*"
+```
+
+| ファイル | 種類 |
+| --- | --- |
+| `id_ed25519_vyos_lab` | 秘密鍵。Windowsに保管する |
+| `id_ed25519_vyos_lab.pub` | 公開鍵。次の手順で内容を表示する |
+
+パスフレーズを省略して`Enter`を2回押すと、入力なしで使える秘密鍵になる。その鍵を取得した人もログインできるため、本書では**パスフレーズを設定し、手順3.5のssh-agentを利用する**。
+
+### 3.3 公開鍵の登録内容を準備する【Windows・PowerShell】
+
+```powershell
+Get-Content "$env:USERPROFILE\.ssh\id_ed25519_vyos_lab.pub"
+```
+
+公開鍵は次のような**1行**である。以下は形式の説明で、実際に使える鍵ではない。
+
+```text
+ssh-ed25519 AAAAから始まる長い文字列 vyos-lab-pc01
+```
+
+| 公開鍵の部分 | VyOSでの指定先 |
+| --- | --- |
+| 最初の`ssh-ed25519` | `type`の値 |
+| 2番目の`AAAA…`という長い文字列 | `key`の値。この部分だけをコピーする |
+| 最後の`vyos-lab-pc01` | コメント。`key`には含めない |
+
+画面で折り返して見えても1行である。コピー時に改行を追加しない。**`key`へ公開鍵1行全体を貼らない。** VyOSは鍵の種類と本体を別々に指定する。[VyOS公式：公開鍵認証](https://docs.vyos.io/en/1.5/configuration/system/login.html#key-based-authentication)
+
+### 3.4 公開鍵を登録する【VyOS・接続済みのSSHターミナル】
+
+`vyos@R1:~$`が表示された、元のSSHターミナルへ戻る。次の`PUBLIC_KEY_BODY`を、手順3.3の**2番目の長い文字列**に置き換えてから実行する。`PUBLIC_KEY_BODY`という文字をそのまま登録しない。
+
+```text
+configure
+set system login user vyos authentication public-keys pc01 type ssh-ed25519
+set system login user vyos authentication public-keys pc01 key 'PUBLIC_KEY_BODY'
+compare
+commit
+save
+exit
+```
+
+`pc01`は登録する鍵の名前である。端末2は`pc02`など別名にして、端末ごとに自分の公開鍵を登録する。同じ名前を再利用すると既存の鍵を変更するため、ほかの人の登録名と重複させない。
+
+### 3.5 鍵をssh-agentに登録する【Windows】
+
+**教員が最初に1回、管理者のPowerShellで実行する：**
+
+```powershell
+Set-Service -Name ssh-agent -StartupType Automatic
+Start-Service ssh-agent
+Get-Service ssh-agent
+```
+
+`Status`が`Running`になったことを確認する。管理者のPowerShellはここで閉じる。
+
+**学生は鍵を作成したWindowsアカウントで、通常のVS CodeのPowerShellに戻って実行する：**
+
+```powershell
+ssh-add "$env:USERPROFILE\.ssh\id_ed25519_vyos_lab"
+ssh-add -l
+```
+
+ここで尋ねられるのは**鍵のパスフレーズ**である。登録完了のメッセージと、`ssh-add -l`の鍵の一覧を確認する。別の管理者アカウントで鍵を登録しない。`ssh-agent`が利用できない場合も公開鍵認証は使えるが、接続時に鍵のパスフレーズを入力する必要がある。[Microsoft公式：鍵の作成とssh-agent](https://learn.microsoft.com/en-us/windows-server/administration/openssh/openssh_keymanagement)
+
+### 3.6 新しい接続で公開鍵認証を試す【Windows・PowerShell】
+
+**元のSSH接続と、本体のコンソールを利用できる状態を残したまま**、Windows側のターミナルで次を実行する。1行のコマンドである。
+
+```powershell
+ssh -i "$env:USERPROFILE\.ssh\id_ed25519_vyos_lab" -o IdentitiesOnly=yes -o PreferredAuthentications=publickey -o PasswordAuthentication=no -o KbdInteractiveAuthentication=no vyos@192.168.21.1
+```
+
+`-i`は使う秘密鍵を指定する。残りのオプションは、この確認で指定した鍵による公開鍵認証を使い、パスワード認証へ切り替わらないようにする指定である。`-o`はSSHの設定項目を指定するオプションである。
+
+新しい接続で`vyos@R1:~$`が出て、次が実行できれば成功である。
+
+```text
+show version
+```
+
+鍵がssh-agentに登録されていれば、通常はパスワードもパスフレーズも入力せずに接続できる。`Enter passphrase for key ...`が出る場合は鍵の登録状態を確認する。`Permission denied (publickey)`などで失敗した場合は、元の接続を残して手順3.3〜3.5を見直す。
+
+### 3.7 次回からのログイン【Windows・PowerShell】
+
+動作確認後は次の短いコマンドを使える。
+
+```powershell
+ssh -i "$env:USERPROFILE\.ssh\id_ed25519_vyos_lab" -o IdentitiesOnly=yes vyos@192.168.21.1
+```
+
+接続先のアカウントパスワードを尋ねられた場合は、鍵でのログインに成功していない。入力して先へ進めず、鍵の登録内容を確認する。PCを再起動した後も`ssh-add -l`で鍵を確認し、登録されていなければ手順3.5の`ssh-add`で追加する。
+
+## 4. SSHのパスワード認証を無効にする【教員の指示がある場合】
+
+手順3だけで、公開鍵を使ったパスワード入力なしのログインはできる。ここではさらに、SSHでパスワードを使う接続を禁止する。**この設定は`vyos`だけでなくSSHサービス全体に適用される。** 教員用を含め、必要な全端末・全ユーザーの公開鍵ログインを確認してから行う。
+
+### 4.1 無効化と再確認【VyOS】
+
+元のSSH接続を残し、本体コンソールでのログイン手段も確保したうえで実行する。
+
+```text
+configure
+set service ssh disable-password-authentication
+compare
+commit
+save
+exit
+```
+
+Windowsで**別の新しいターミナル**を開き、手順3.6のコマンドでもう一度ログインする。既存の接続が動いているだけでは、新しいログインが成功するか判断できない。
+
+**VyOSユーザーのパスワードやアカウントは削除しない。** 本体コンソールで復旧するため、教員がパスワードを管理する。SSHのパスワード認証を止める設定と、アカウントのパスワードを消す設定は別である。
+
+### 4.2 ログインできなくなった場合【本体コンソール】
+
+本体で`vyos`と教員管理のパスワードを使ってログインする。元のSSH接続が残っている場合は、そこからも復旧できる。
+
+```text
+configure
+delete service ssh disable-password-authentication
+commit
+save
+exit
+```
+
+これで、この設定によるパスワード認証の禁止を解除できる。接続元の制限などが別に設定されている場合は、それも教員と確認する。公開鍵を修正し、新規接続の試験を済ませてから再度無効化する。
+
+## 5. よくあるトラブル
+
+| 症状 | 確認・対処 |
+| --- | --- |
+| Windowsで`ssh`が見つからない | 手順1.3でOpenSSHクライアントを導入し、VS Codeを開き直す |
+| 接続がタイムアウトする | 実験用LANの配線・IP・ファイアウォールを確認し、`Test-NetConnection 接続先IP -Port 22`で調べる |
+| `Connection refused` | 接続先IPが正しいか、VyOSでSSHが有効か、待受IPとポートが合っているか確認する |
+| 初回から`Permission denied (publickey)` | パスワード認証がすでに無効な可能性がある。教員に公開鍵をコンソールから登録してもらう |
+| 公開鍵認証に失敗する | 接続ユーザー名、鍵のファイル名、`type`と`key`の対応を確認する。`key`に`ssh-ed25519`やコメントを含めない |
+| `Could not open a connection to your authentication agent` | 手順3.5でWindowsのssh-agentが起動しているか確認する |
+| `ssh-add -l`で鍵がない | 鍵を作ったWindowsアカウントで、指定の秘密鍵を`ssh-add`する |
+| VyOSでPowerShellのコマンドがエラーになる | 実行場所が違う。Windows側のターミナルを選ぶ |
+| 再起動後にSSH設定や公開鍵が消える | ライブ起動でないか確認する。永続インストールの要否を教員へ相談する |
+| `REMOTE HOST IDENTIFICATION HAS CHANGED!` | 接続先の機器が変わった可能性がある。警告を無視せず、本体コンソールでフィンガープリントを再確認する |
+
+機器の再インストールなどによるホスト鍵の変更を**教員と確認できた場合に限り**、Windowsで古い接続先の記録を削除する。R1の例は次のとおりである。
+
+```powershell
+ssh-keygen -R 192.168.21.1
+```
+
+その後に接続し、新しいフィンガープリントを本体表示と照合する。`known_hosts`ファイル全体の削除や、ホスト鍵の確認を無効にする設定は使わない。
+
+## 6. 完了確認と実験終了時の扱い
+
+- [ ] VS Codeが起動し、PowerShellで`ssh -V`を実行できた。
+- [ ] 自分のペアのIPへ接続し、VyOSで`show version`を実行できた。
+- [ ] 公開鍵認証に限定した手順3.6で、新しい接続に成功した。
+- [ ] ssh-agentを利用し、パスワード・パスフレーズを毎回入力せずに接続できた。
+- [ ] 接続先IP、VyOSの版、登録名（`pc01`など）、試験結果を実験ノートへ記録した。
+
+実験ノートに秘密鍵、VyOSのパスワード、鍵のパスフレーズを書かない。接続を終えるときはVyOSの運用モードで`exit`を入力する。
+
+共用PCを返却する場合は教員の指示に従って実験用の鍵を片付ける。接続を終了し、Windowsで`ssh-add -d "$env:USERPROFILE\.ssh\id_ed25519_vyos_lab"`を実行してagentから登録を外す。不要になった鍵は、VyOS側の該当する`public-keys pc01`とWindows側の実験用鍵ファイルの両方を教員が確認して削除する。ほかの用途の鍵や、ほかの利用者の登録は削除しない。
+
+## 教員用：配布前の確認
+
+この手順はVyOS 1.5系の公式資料とWindowsのOpenSSHを前提に作成した。授業用の実機では未検証のため、指定イメージで`show ssh fingerprints`、公開鍵の登録、新規SSH接続、再起動後の設定保持を事前確認する。初期パスワードの変更、接続元の制限、共用PCの鍵の管理、ソフトウェア取得用のネットワークは授業前に準備する。
+
+`under_construction`内の旧準備原稿には、公開鍵の`key`へ1行全体を入れる説明など、現行手順と異なる記述がある。本作業ではこの手順書を使う。
