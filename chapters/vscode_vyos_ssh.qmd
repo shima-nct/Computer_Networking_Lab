@@ -1,5 +1,5 @@
 ---
-title: "VS Codeの準備とVyOSへのSSHログイン"
+title: "Windows 11へのVS Code導入とVyOSへのSSH公開鍵登録"
 date: "2026-10-08"
 format:
   html:
@@ -8,15 +8,17 @@ format:
     embed-resources: true
 ---
 
-# VS Codeの準備とVyOSへのSSHログイン
+# Windows 11へのVS Code導入とVyOSへのSSH公開鍵登録
 
 2026年度 E3 ネットワーク構築・準備手順書（2026年10月8日作成）
 
 ## この手順でできるようになること
 
-1. WindowsにVisual Studio Code（VS Code）をインストールする。
+1. Windows 11にVisual Studio Code（VS Code）をインストールする。
 2. VS Codeのターミナルから、自分のペアのVyOSへSSHでログインする。
 3. 公開鍵認証を設定し、VyOSのパスワードを入力せずにログインする。
+
+**作業の順序：** VS Codeの導入 → 最初のSSHログイン → Windowsで鍵を作成 → VyOSへ公開鍵を登録 → ssh-agentへ鍵を登録 → 新しい接続で確認。通常は手順3までで完了する。手順4は教員が必要と判断した場合だけ行う。
 
 SSHは、ネットワーク経由で別の機器へログインし、暗号化した通信で操作するための仕組みである。サーバーやルーターを、その機器の前まで行かずに管理するときに使う。
 
@@ -63,6 +65,8 @@ Rufusで作ったUSBからライブ起動している場合、この手順のSSH
 
 ## 1. VS Codeをインストールする【Windows PC】
 
+インストーラー、日本語の言語パック、必要に応じてOpenSSHクライアントを取得するため、ここまではインターネットへ接続できる環境で行う。実験用LANから取得できない場合は、実験前に導入を済ませる。
+
 ### 1.1 インストーラーを実行する
 
 1. スタートメニューで`Visual Studio Code`を検索する。すでに起動できれば、インストールは省略して手順1.2へ進む。
@@ -93,6 +97,8 @@ ssh -V
 ```
 
 `OpenSSH_for_Windows_…`などの版が表示されればよい。`-V`は版を表示するオプションで、大文字の`V`を使う。「認識されません」と出る場合は、教員が**管理者のPowerShell**で次を実行する。
+
+管理者のPowerShellは、Windows 11のスタートメニューで`PowerShell`を検索し、「管理者として実行」から開く。通常のVS Code内のPowerShellとは権限が異なる。
 
 ```powershell
 Add-WindowsCapability -Online -Name OpenSSH.Client~~~~0.0.1.0
@@ -165,6 +171,8 @@ show interfaces
 ```
 
 運用モードで`exit`と入力するとSSH接続が終了し、Windowsの`PS C:\…>`に戻る。設定モードにいる場合、最初の`exit`は運用モードへ戻る操作になる。
+
+**続けて公開鍵を登録するので、ここではSSH接続を残して手順3へ進む。** すでに終了した場合は、手順2.3の`ssh`コマンドでもう一度ログインする。
 
 ## 3. 公開鍵認証でパスワード入力を省く
 

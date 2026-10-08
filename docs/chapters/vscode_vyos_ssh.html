@@ -8,7 +8,7 @@
 
 <meta name="dcterms.date" content="2026-10-08">
 
-<title>VS Codeの準備とVyOSへのSSHログイン</title>
+<title>Windows 11へのVS Code導入とVyOSへのSSH公開鍵登録</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -2210,7 +2210,7 @@ vertical-align: -.125em;
     <h2 id="toc-title">手順の目次</h2>
 
   <ul>
-  <li><a href="#vs-codeの準備とvyosへのsshログイン" id="toc-vs-codeの準備とvyosへのsshログイン" class="nav-link active" data-scroll-target="#vs-codeの準備とvyosへのsshログイン">VS Codeの準備とVyOSへのSSHログイン</a>
+  <li><a href="#windows-11へのvs-code導入とvyosへのssh公開鍵登録" id="toc-windows-11へのvs-code導入とvyosへのssh公開鍵登録" class="nav-link active" data-scroll-target="#windows-11へのvs-code導入とvyosへのssh公開鍵登録">Windows 11へのVS Code導入とVyOSへのSSH公開鍵登録</a>
   <ul class="collapse">
   <li><a href="#この手順でできるようになること" id="toc-この手順でできるようになること" class="nav-link" data-scroll-target="#この手順でできるようになること">この手順でできるようになること</a></li>
   <li><a href="#操作するpcと接続先を確認する" id="toc-操作するpcと接続先を確認する" class="nav-link" data-scroll-target="#操作するpcと接続先を確認する">0. 操作するPCと接続先を確認する</a>
@@ -2255,22 +2255,23 @@ vertical-align: -.125em;
 <main class="content" id="quarto-document-content">
 
 <header id="title-block-header">
-<h1 class="title display-7">VS Codeの準備とVyOSへのSSHログイン</h1>
+<h1 class="title display-7">Windows 11へのVS Code導入とVyOSへのSSH公開鍵登録</h1>
 
 <p class="date">2026-10-08</p>
 </header>
 
 
-<section id="vs-codeの準備とvyosへのsshログイン" class="level1">
-<h1>VS Codeの準備とVyOSへのSSHログイン</h1>
+<section id="windows-11へのvs-code導入とvyosへのssh公開鍵登録" class="level1">
+<h1>Windows 11へのVS Code導入とVyOSへのSSH公開鍵登録</h1>
 <p>2026年度 E3 ネットワーク構築・準備手順書（2026年10月8日作成）</p>
 <section id="この手順でできるようになること" class="level2">
 <h2 class="anchored" data-anchor-id="この手順でできるようになること">この手順でできるようになること</h2>
 <ol type="1">
-<li>WindowsにVisual Studio Code（VS Code）をインストールする。</li>
+<li>Windows 11にVisual Studio Code（VS Code）をインストールする。</li>
 <li>VS Codeのターミナルから、自分のペアのVyOSへSSHでログインする。</li>
 <li>公開鍵認証を設定し、VyOSのパスワードを入力せずにログインする。</li>
 </ol>
+<p><strong>作業の順序：</strong> VS Codeの導入 → 最初のSSHログイン → Windowsで鍵を作成 → VyOSへ公開鍵を登録 → ssh-agentへ鍵を登録 → 新しい接続で確認。通常は手順3までで完了する。手順4は教員が必要と判断した場合だけ行う。</p>
 <p>SSHは、ネットワーク経由で別の機器へログインし、暗号化した通信で操作するための仕組みである。サーバーやルーターを、その機器の前まで行かずに管理するときに使う。</p>
 <p>本書ではWindows版VS Codeの<strong>内蔵ターミナルで<code>ssh</code>コマンドを使う</strong>。この方法ではRemote - SSH拡張機能や、VyOS側へのVS Code Serverの導入は不要である。Remote - SSHは接続先のファイルを編集するための別の仕組みで、接続先にも動作条件がある。<a href="https://code.visualstudio.com/docs/terminal/basics">VS Code公式：ターミナル</a>、<a href="https://code.visualstudio.com/docs/remote/ssh">Remote - SSH</a></p>
 </section>
@@ -2405,6 +2406,7 @@ vertical-align: -.125em;
 </section>
 <section id="vs-codeをインストールするwindows-pc" class="level2">
 <h2 class="anchored" data-anchor-id="vs-codeをインストールするwindows-pc">1. VS Codeをインストールする【Windows PC】</h2>
+<p>インストーラー、日本語の言語パック、必要に応じてOpenSSHクライアントを取得するため、ここまではインターネットへ接続できる環境で行う。実験用LANから取得できない場合は、実験前に導入を済ませる。</p>
 <section id="インストーラーを実行する" class="level3">
 <h3 class="anchored" data-anchor-id="インストーラーを実行する">1.1 インストーラーを実行する</h3>
 <ol type="1">
@@ -2435,6 +2437,7 @@ vertical-align: -.125em;
 </ol>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode powershell code-with-copy"><code class="sourceCode powershell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>ssh <span class="op">-</span>V</span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 <p><code>OpenSSH_for_Windows_…</code>などの版が表示されればよい。<code>-V</code>は版を表示するオプションで、大文字の<code>V</code>を使う。「認識されません」と出る場合は、教員が<strong>管理者のPowerShell</strong>で次を実行する。</p>
+<p>管理者のPowerShellは、Windows 11のスタートメニューで<code>PowerShell</code>を検索し、「管理者として実行」から開く。通常のVS Code内のPowerShellとは権限が異なる。</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode powershell code-with-copy"><code class="sourceCode powershell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>Add-WindowsCapability <span class="op">-</span>Online <span class="op">-</span>Name OpenSSH<span class="op">.</span><span class="fu">Client</span><span class="op">~~~~</span><span class="dv">0.0</span><span class="op">.</span><span class="dv">1.0</span></span></code></pre></div><button title="コピー" class="code-copy-button"><i class="bi"></i></button></div>
 <p>導入後はVS Codeを開き直し、もう一度<code>ssh -V</code>で確認する。Windowsに必要なのはSSHの<strong>クライアント</strong>である。<a href="https://learn.microsoft.com/en-us/windows-server/administration/openssh/openssh_install_firstuse">Microsoft公式：OpenSSHの導入</a></p>
 </section>
@@ -2487,6 +2490,7 @@ exit</code></pre>
 <pre class="text"><code>show version
 show interfaces</code></pre>
 <p>運用モードで<code>exit</code>と入力するとSSH接続が終了し、Windowsの<code>PS C:\…&gt;</code>に戻る。設定モードにいる場合、最初の<code>exit</code>は運用モードへ戻る操作になる。</p>
+<p><strong>続けて公開鍵を登録するので、ここではSSH接続を残して手順3へ進む。</strong> すでに終了した場合は、手順2.3の<code>ssh</code>コマンドでもう一度ログインする。</p>
 </section>
 </section>
 <section id="公開鍵認証でパスワード入力を省く" class="level2">
